@@ -1,0 +1,1191 @@
+\documentclass[a4paper,openany,11pt]{book}
+
+
+%%includes and style stuf 
+	\usepackage{nameref}
+	\usepackage[dvipsnames]{xcolor}
+	\usepackage{graphicx} 
+	\graphicspath{{Figures/}}
+	\usepackage[left=1in,right=1in,top=0.5in,bottom=0.8in]{geometry}
+	\usepackage[breaklinks]{hyperref}
+	\usepackage{microtype}
+	\usepackage{tikz}
+	\usepackage{natbib}
+	\usepackage{multicol}
+	\usepackage{amsmath}
+	\usepackage{amssymb}
+	\usepackage{JML}
+	\usepackage{tikz}
+	\usepackage{pgfplots}
+	\usepackage{wrapfig}
+	\usepackage[framemethod=tikz]{mdframed}
+	\mdfdefinestyle{mpdframe}{
+		frametitlebackgroundcolor   =black!15,
+		frametitlerule          =true,
+			roundcorner     =10pt,
+			middlelinewidth     =1pt,
+			innermargin     =.20cm,
+			outermargin     =0.2cm,
+			innerleftmargin     =0.2cm,
+			innerrightmargin        =0.2cm,
+			innertopmargin      =\topskip,
+			innerbottommargin   =\topskip,
+				}
+	%   Studies
+	\mdfdefinestyle{a}{%
+			style=mpdframe,
+			frametitle={Aside},
+		}
+
+		% \newcommand\inner[2]
+		% {
+		% 	\langle \vec{#1}, \vec{#2} \rangle
+		% }
+	\newmdenv[style=a]{aside}
+	\setlength\parindent{0pt}
+	\setlength\parskip{8pt}
+
+\title{First Principles of Machine Learning \\ Notes}
+\author{Jack Fraser-Govil}
+\date{October 2024}
+\renewcommand\vec[1]{\boldsymbol{\mathbf{#1}}}
+\def\t{^\intercal}
+\begin{document}
+	\maketitle
+
+	\setcounter{tocdepth}{1}
+	{\tableofcontents{}}	
+
+	\part{Background Mathematics}
+
+
+		\chapter{Introduction}
+
+			{\large This section is designed to provide a brief overview of the background mathematics which will be touched upon during the workshop.
+
+			It is \textbf{not} intended to be a comprehensive overview of the topics, and I will freely gloss over things that are uninteresting or irrelevant for the purpose at hand. This document is meant to be a quick reference guide, or a refresher for people who once knew these things, but have long since forgotten them. 
+
+			If you read nothing else, it will be vitally important for you to have a grasp of the \textbf{chain rule}, since this is the cornerstone of backpropagation. Similarly, understanding Matrix multiplication (even if you can't actually do it by hand) and the dot product will be of vital importance for our work.}
+
+			\section{Some Basic Notation}
+
+				I will be using (mostly) formal mathematical notation throughout, but will endeavour to ensure that whenever notation is first introduced,  it is explained. I will also ensure that the surrounding text explains what is going on such that you should be able to gather from context clues what an expression means. 
+
+				That being said, some basic notation is helpful to get out of the way:
+
+				\begin{itemize}
+					\item Scalar quantities (i.e. simple numbers and placeholders), will be written in lower case italics. $x$, $y$, $z$ and so on. 
+					\begin{itemize}
+						\item An exception to this is \textit{scaling parameters} (i.e. numbers which control how large a function is) will be written in curly fonts, $\mathcal{N}, \mathcal{A}$ if we don't actually care about their value.
+						\item Functions will also be written in lower case italics; $y = f(x)$\footnote{Technically I should reserve this for 'scalar functions' (where the output is a scalar); and let vector functions be written as $\vec{f}(x)$, for example. For simplicity, I won't do this: all functions will be written the same.}.
+					\end{itemize}
+					\item Vector quantities will be written in boldface. $\vec{x}$, $\vec{y}$, $\vec{a}$.
+					\begin{itemize}
+						\item Since \textit{elements} of a vector are (usually) scalars, they will be written in italics. $a_i$ = $[\vec{a}]_i$ is the $i^\text{th}$ element of the vector $\vec{a}$.
+					\end{itemize}
+					\item Matrices (and Linear Operators) will be written in capital italics; $M, N, P$ and so on.
+					\item Derivatives will usually be written in Newton's Notation ($\div{y}{x}$), but I will sometimes use Leibniz's notation ($f^\prime(x)$) if the text is getting a bit cramped! This is purely a stylistic choice. Don't read into it.
+				\end{itemize}
+		
+
+		\chapter{Calculus}
+
+			Calculus is the mathematical study of \textit{change}. It is needed in order to study how a function varies as its inputs are altered. For the purposes of machine learning, therefore, it is of vital importance in the process of optimization, since we are (hopefully) trying to alter the parameters of a model until the loss function reaches a maximum: this is a process only possible via calculus. 
+
+			\section{Functions}
+
+				The notation and theory which underlies even the simplest of functions is vast and complex (Real Analysis), and is a field where trivial-sounding statements are often impossible to prove. 
+				
+				Luckily, we don't need any of that. 
+
+				For our purposes, it is sufficient to note that a function is any form of \textbf{mapping} between two sets of objects. It is common for these sets to be two different kinds of numbers: for instance the function $f(x) = x^2$ maps all (real) numbers to the set of all positive numbers. However, there is no general restriction that a function `only' has to be a relationship between numbers. 
+
+				A function is a black box, into which you put an input, and you receive an output. We denote this as:
+
+				\begin{equation}
+					y_\text{output} = f(x_\text{input})
+				\end{equation}
+				Here $x$ and $y$ can be anything; $x$ might be a particular scent, and $y$ could be the U2 album that smell most reminds my Dad of. In general, however, we will be most interested in cases where these are numerical quantities: either vectors or scalars. 
+
+
+
+				\subsection{Continuity}
+
+					A function is said to be \textbf{continuous at a point} if it obeys the following relationship:
+
+					\begin{equation}
+						\lim_{x \to c}\left(f(x)\right)  = f(c)
+					\end{equation}
+					That is, the limit of the function is the same as the value of the function. This definition also implicitly requires that the limit be the same \textit{no matter which direction you approach from}.
+
+					\begin{center}
+						\begin{tikzpicture}
+						
+						\begin{axis}[xmin = -2, xmax = 2, ymin = -3, ymax = 1.2, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+										\addplot[domain = -2:0, samples = 200,blue]{x};
+										\addplot[domain = 0:2, samples = 200,blue]{1-x};
+									\end{axis}
+						
+						\end{tikzpicture}
+						\end{center}
+					The function above is therefore non-continuous at $x = 0$ because the limit has different values depending on if you approach from the left or the right. 
+
+					`Continuity' is therefore a fancy way of saying `if you draw the function as a graph, you don't have to take your pen off the page' -- however this definition generalises to arbitrary quantities where you can meaningfully define limits (such as 24-dimensional spaces where your pencil would have to curl in on itself).
+
+				\subsection{Nested or Chained Functions}
+
+					It will be exceptionally common (and very important for us!) to consider the cases where functions are nested. If $f$ and $g$ are both functions from some `object space'\footnote{A field} $F$ to the same space (i.e. the output is the same type of object as the input), then it is possible to have:
+					\begin{equation}
+						y = f(g(x))~~~~ \leftrightarrow~~~~ y = f\circ g\circ x
+					\end{equation}
+					(This $\circ$ notation is a functional notation some mathematicians like. It cuts down on parentheses.) This should be read as ``do $g$ to $x$ first, and then do $f$ to the output of that''.
+
+					Many more complex mathematical expressions can be written as nestings of more simple functions; for instance the Gaussian function \textit{can} be written as:
+					\begin{equation}
+						y = \mathcal{N} \exp\left(- \frac{1}{2} \left( \frac{x - \mu}{\sigma}\right)^2\right)
+					\end{equation}
+					Or it can be written as:
+					\begin{align}
+						y(x) & = \mathcal{N} f(g(h(x)))
+						\\
+						f(g) & = \exp(g)
+						\\
+						g(h) & = -\frac{1}{2} h^2
+						\\
+						h(x) & = \frac{x - \mu}{\sigma}
+					\end{align}
+
+			\section{Derivatives}
+
+				We will now assume that we are dealing solely with real functions; those where the inputs and outputs are both real numbers. When you have such a function, it is natural to ask ``how does the output change when I change the input?''.
+
+				This is the \textbf{gradient} of the function: for a function $y = f(x)$, it is the amount that $y$ changes, when $x$ changes by a small amount. 
+
+				It is clear that the answer to this question varies, depending where you are looking. In the plot below, the gradient at $x = 0$ (the first red dot) is clearly very flat; the value of the function at $x = 0.1$ is 0.01; very close to zero, and so the function has not changed that much. At $x = 1.5$ (and $y = 2.25$), however, the gradient is much steeper: increasing $x$ by 0.1 increases $y$ by 0.31 -- 31 times larger than the increase we saw at $x = 0$!
+
+				\begin{center}
+					\begin{tikzpicture}
+					
+					\begin{axis}[xmin = -2, xmax = 2, ymin = -1, ymax = 5, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+									\addplot[domain = -2:2, samples = 200,blue]{x^2};
+									%  \addplot[domain = 0.5:1.5, samples = 2, red, ultra thick]{2*x - 1};
+									\addplot[mark=*, red] coordinates {(0,0)};
+									\addplot[mark=*, red] coordinates {(1.5,2.25)};
+
+									% \addplot[domain = 0.5:1.5, samples = 2, green,ultra thick]{2*x - 0.75};
+									%  \addplot[mark=*, green] coordinates {(-1,1)};
+									%  \addplot[domain = -1:1, samples=2, orange, ultra thick]{0};
+									%  \addplot[mark=*, orange] coordinates {(0,0)};
+								\end{axis}
+					
+					\end{tikzpicture}
+					\end{center}
+
+				The gradient of $f(x)$ is therefore a second function; when evaluated at $x$ it tells you how steep the original function is at that point. This gradient function is the \textit{derivative} of the function, and is denoted:
+				\begin{equation}
+					\text{gradient of $f$ at }x = \div{f}{x} = f^\prime(x)
+				\end{equation}
+
+				\subsubsection{Isn't that a fraction?}
+				Despite being written using familiar notation, mathematicians will generally start shouting at you if you treat $\div{f}{x}$ like a fraction. They'll start howling about things like `infinitesimals' and `surreal numbers'.
+				
+				The dirty secret that mathematicians don't want you to know is that it is \textit{often perfectly fine} to do so with single-valued functions, and things behave as intuitively as you might expect:
+				\begin{align}
+					\div{x}{x} & = 1
+					\\
+					\frac{1}{\left(\div{y}{x} \right)} & = \div{x}{y}
+					\\
+					\div{f}{x}\d x & = \d f
+				\end{align}
+				However, when it comes to \textit{multivariable calculus}, and things start looking like $\pdiv{f}{x}$, then you should never treat them as fractions.
+
+				\subsection{Formally Defining the Derivative}
+
+					Even though it's not strictly necessary, it can often be helpful to recall the formal definition of the derivative. 
+
+					Consider a function $f(x)$ which you are able to calculate, but you would like to know the \textbf{gradient} of. In the absence of any other ideas, tt is reasonable to try and estimate the gradient using a \textbf{chord}. 
+					
+					To do this, we choose a point $\Delta x$ away from $x$, and then draw a line between the two points.  An example of this is shown in Fig. \ref{F:Chord1}.
+					\begin{figure}
+						\begin{center}
+						\begin{tikzpicture}
+						
+						\begin{axis}[xmin = -2, xmax = 2, ymin = -1, ymax = 5, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+										\addplot[domain = -2:2, samples = 200,blue]{x^2};
+										%  \addplot[domain = 0.5:1.5, samples = 2, red, ultra thick]{2*x - 1};
+										\addplot[mark=*, red] coordinates {(0.5,0.25)};
+										\addplot[mark=*, red] coordinates {(1.5,2.25)};
+
+										\addplot[domain = 0.5:1.5, samples = 2, green,ultra thick]{2*x - 0.75};
+										%  \addplot[mark=*, green] coordinates {(-1,1)};
+										%  \addplot[domain = -1:1, samples=2, orange, ultra thick]{0};
+										%  \addplot[mark=*, orange] coordinates {(0,0)};
+									\end{axis}
+						
+						\end{tikzpicture}
+						\end{center}
+						\caption{\small A Chord-approximation using $x_1 = 0.5$ and $x_2 = 1.5$}\label{F:Chord1}
+					\end{figure}
+						The gradient of this choord can easily be computed as:
+						\begin{equation}
+							g = \frac{\Delta y}{\Delta x} = \frac{f(1.5) - f(0.5)}{(1.5) - (0.5)}
+						\end{equation}
+						Since (in this case) $f(x) = x^2$, this simplifies down to:
+						\begin{equation}
+							g = \frac{2.25 - 0.25}{1} =2
+						\end{equation}
+						Therefore the gradient \textit{of the chord} is equal to 2; but we can see that this isn't quite the gradient of the function -- the chord is much steeper! The chord is merely an approximation to the true gradient.
+						
+
+						If we reduce $\Delta x$, then maybe we get a better approximation (see Fig \ref{F:Chord2}):
+						\begin{align}
+							\begin{split}
+							g & = \frac{\Delta y}{\Delta x} 
+							\\
+							& = \frac{f(0.75) - f(0.5)}{(0.75) - (0.5)}
+							\\
+							& = \frac{0.5625 - 0.25}{0.25}
+							\\
+							& = 1.25
+							\end{split}
+						\end{align}
+
+						\begin{figure}
+							\begin{center}
+							\begin{tikzpicture}
+							
+								\begin{axis}[xmin = -2, xmax = 2, ymin = -1, ymax = 5, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+									\addplot[domain = -2:2, samples = 200,blue]{x^2};
+									%  \addplot[domain = 0.5:1.5, samples = 2, red, ultra thick]{2*x - 1};
+									\addplot[mark=*, red] coordinates {(0.5,0.25)};
+									\addplot[mark=*, red] coordinates {(0.75,0.5625)};
+
+									\addplot[domain = 0.25:1, samples = 2, green,ultra thick]{1.25*x - 0.375};
+									%  \addplot[mark=*, green] coordinates {(-1,1)};
+									%  \addplot[domain = -1:1, samples=2, orange, ultra thick]{0};
+									%  \addplot[mark=*, orange] coordinates {(0,0)};
+								\end{axis}
+							
+							\end{tikzpicture}
+							\end{center}
+							\caption{\small A Chord-approximation using $x_1 = 0.5$ and $x_2 = 0.75$}\label{F:Chord2}
+						\end{figure}
+						
+						This is clearly much closer! We could repeat this exercise using the formula:
+						\begin{equation}
+							g \approx \frac{f(x + \Delta x) - f(x)}{\Delta x}
+						\end{equation}
+						If we repeat this with successively smaller $\Delta x$, we would (hopefully) eventually converge on the correct final answer. 
+
+						\textbf{This is what differentiation is.} It is the above process, taken to the infinite limit where $\Delta x$ becomes infinitesimally small:
+						\begin{equation}
+							\frac{\d y}{\d x} = \lim_{\delta \to 0} \left( \frac{ f(x + \delta) - f(x)}{\delta} \right)
+						\end{equation}
+
+						Of course, the problem with this is that dividing by zero is undefined, so you can't just put $\delta = 0$ in here! The process works because, as you divide by zero, the number on the top \textit{also} becomes zero (because $f(x+\delta)$ and $f(x)$ become very similar) - so you are dividing an infinitely small value by another infinitely small value; in the hope that it cancels out, and you are left with something sane. 
+
+						The joy of the above definition is that you don't \textbf{actually} need to care about it -- it is the formal definition of a derivative, and can be helpful to remember what it means (especially when optimising). When dealing with an actual function, however, the derivatives are (usually) expressible in terms of other functions. 
+
+						I won't prove these results now, but it can be shown that:
+						\begin{align}
+							\frac{\d}{\d x} & x^n  = n x^{n-1}
+							\\
+							\frac{\d}{\d x} & \cos(x)  = - \sin(x)
+							\\
+							\frac{\d}{\d x} & \log(x)  = \frac{1}{x}
+							\\
+							\div{}{x} & \exp(x) = \exp(x)
+						\end{align}
+						A discussion of how these values arise can be found in chapter \ref{Int:Polynomial}.
+
+				\section{Properties of the Derivative}
+
+					This can all seem quite complex and overwhelming, but the derivative is in fact a lovely object, and has a number of desirable properties.
+
+					\subsubsection{It is a Linear Operator}
+
+						This means that if you know the derivative of $f$ and the derivative of $g$, then:
+						\begin{equation}
+							\frac{\d}{\d x} \left(f(x) + \alpha g(x) \right) = \frac{\d f}{\d x} + \alpha \frac{\d g}{\d x}
+						\end{equation}
+						You can split apart sums, and pull constant functions out of the derivative, leaving you to focus on the nasty bits. 
+
+					\subsubsection{It Vanishes at Maxima and Minima}
+
+						Maxima or a Minima are, by definition, the local extrema of a function -- they are (locally) the highest or lowest values the function achieves. It must therefore, follow, therefore, that the gradient is zero at these points -- or else you could increase (for maxima) or decrease (for minima) the value of the function by stepping in the direction of the non-zero gradient. 
+
+						Finding the extremal points of a function can therefore be reduced to finding the solution(s) to:
+						\begin{equation}
+							f^\prime(x) = \frac{\d f}{\d x} ~~~~\Longrightarrow ~~~~f^\prime(x) = 0
+						\end{equation}
+
+					\subsubsection{Products are Easy}
+
+						The linear operator makes adding functions trivially easy. Multiplying functions is a bit harder, but is still a simple rule:
+
+						\begin{equation}
+							\div{}{x}\Big( f(x) \times g(x) \Big) = f(x) \div{g}{x} + g(x) \div{f}{x}
+						\end{equation}
+
+						For example:
+						\begin{align}
+							\begin{split}
+							\div{}{x}( x \sin(x)) & = \sin(x) \div{x}{x}  + x \div{\sin(x)}{x}
+							\\
+							& = \sin(x) + x \cos(x)
+							\end{split}
+						\end{align}
+
+					\subsubsection{Chains are Possible}
+
+						It is possible to 'chain together' derivatives, allowing you to take derivatives of functions-of-functions. For example, the function $f(x) = \log(x^2)$ can be thought of as $f(x) = \log(g(x))$ where $g(x) = x^2$.
+
+						In this case you can use the chain rule:
+
+						\begin{equation}
+							\div{}{x} \Big( f(g(x)) \Big) = \frac{\d f}{\d g} \frac{\d g}{\d x}
+						\end{equation}
+						Here you treat $g$ as a variable in the first term, and then like a function in the second. In our above example we have $f = \log(g)$ and $g(x) = x^2$ so:
+						\begin{align}
+							\begin{split}
+							\div{\log(x^2)}{x} & = \left(\frac{1}{g} \right) \times \left( 2 x \right)
+							\\
+							& = \frac{2x}{x^2} = \frac{2}{x}
+						\end{split}
+					\end{align}
+					(We would have gotten the same result if we had used $\log(x^2) = 2 \log(x)$ and then used the linearity condition!)
+
+					\subsubsection{You Can Repeat Derivatives}
+
+						Since $\div{f}{x}$ is itself a function, there's nothing stopping you from taking another derivative:
+						\begin{equation}
+							\div{^2f}{x^2} = \div{}{x} \left( \div{f}{x} \right)
+						\end{equation}
+						This second derivative has some useful properties (it can help infer if an extrema is a maxima or a minima, for example), but in general, it is useful to know that you can take an infinite number of derivatives, if you wanted to.
+
+				\section{Finding Extrema}
+
+						If you are able to compute the derivative of a function, $\div{f}{x} = f^\prime(x)$, then finding the extrema is as simple as finding the zeros fo the function. Consider the polynomial $f(x) = 4 x^3 - 9 x^2 - 12x - 2$. This has derivatives:
+						\begin{equation}
+							f^\prime(x) = 12\left(x^2 - \frac{3}{2} x - 1 \right) = 12(x-2)\left(x + \frac{1}{2}\right)
+						\end{equation}
+						Therefore the gradient has zeros at $x = -0.5, 2$, and so the function has extrema at these locations (since the function is dominated by a $+x^3$ term, we can also immediately infer that $x=-0.5$ is a maxima, and $x = 2$ is a minima).
+		
+						This works great: \textbf{if your derivative-equation has an analytical solution}. This will not always be the case. For example:
+						\begin{equation}
+							\div{}{x} \left( x \sin(x) \right) = \sin(x) + x \cos(x)
+						\end{equation}
+						This is a perfectly well formed derivative, however the solution to the maxima are of the form:
+						\begin{equation}
+							x + \tan(x) = 0
+						\end{equation}
+						This has infinitely many solutions, but only $x = 0$ is analytically solvable, the rest must be computed numerically.
+
+						This highlights an important problem: even if you can write out your derivative in a lovely analytical form, you might still have to resort to inelegant, brute-force methods for finding the optima. This is almost always the case in Machine Learning applications, and is why optimisation and training is such and important part of the process!
+
+
+				
+
+						
+		
+				
+		\chapter{Vectors \& Matrices}
+
+			If I were being cruel and rigorous, I would begin this section by saying that vectors are 'abstract members of a Vector Space', defining them through abstract and ethereal properties, that seem to have no tangible link to 'a vector'. In this language, vectors can be anything; functions, matrices, abstract quantum states, websites\footnote{Yes, seriously, this is how Google's PageRank used to work!} and motorway junctions. 
+
+			That doesn't seem the most helpful approach here, however (I have relegated this discussion to chapter \ref{Int:VectorSpace}). Instead, we will use the following definitions:
+			\begin{itemize}
+				\item A Vector is a structured store of numerical information
+				\item A Matrix is a (linear) operation on that structured information
+			\end{itemize}
+
+			What I have done here is taken the abstract definition and performed an operation known as \textit{projecting onto a basis} -- what I am calling a Vector in this section is merely one \textit{projection} (or \textit{representation}) of a vector.
+
+			The most common form of Vector will be a 'simple linear vector' of dimension $N$, which we can write as a column of $N$ numbers:
+			\begin{equation}
+				\vec{v} = \begin{pmatrix}
+					a \\ b \\ c \\ \vdots \\ z
+				\end{pmatrix}
+			\end{equation}
+			When this information represents a spatial location (for example $\vec{x} = (x,y)$ is the $xy$ coordinates), this correlates with the highschool definition of a vector as 'a quantity that has both magnitude and direction'.
+			
+			For our purposes, however, it is often going to be the case that these objects do not have a meaningful 'direction', but are instead ordered lists of quantities, measurements and data, encodings of information of use to us. Although it is possible to interpret an input image as a `vector with length and direction' just because we've transported it as a vector of pixel intensities, doesn't necessarily mean this is meaningful -- though in Chapter \ref{Int:Angles} I do elaborate how we might meaningfully define a way to interpret angles, with a suitable choice of inner product...
+			
+			\section{Vector Algebra}
+
+				Vectors can be trivially added together and multiplied by scalars\footnote{This is in fact one of the 'abstract definitions' of a vector}:
+				\begin{equation}
+					\begin{pmatrix}
+						a \\ b \\ c
+					\end{pmatrix} + x \begin{pmatrix}
+						d \\ e \\ f
+					\end{pmatrix} = \begin{pmatrix}
+						a + xd \\ b + xe \\ c + xf
+					\end{pmatrix}
+				\end{equation}
+
+				Multiplying Vectors is rather more complicated, and there are multiple different ways to do it. 
+				
+				\subsubsection{Elementwise Product}
+					The simplest vector product is also amongst the least used:
+					\begin{equation}
+						\begin{pmatrix}
+							a \\ b \\ c
+						\end{pmatrix} \odot \begin{pmatrix}
+							d \\ e \\ f
+						\end{pmatrix} = \begin{pmatrix}
+							ad \\ be \\ cf
+						\end{pmatrix} 
+					\end{equation}
+					This is known as the element-wise or \textbf{Hadamard product}, and there is a similar definition for the Hadamard divisor ($\oslash$). This (usually) isn't used very much at all in matrix or vector algebra, though there are some places where it is useful -- the definition of the ADAM optimiser, when written in full vector form defines the step vector $\vec{s}$ as:
+					\begin{align}
+						\vec{m}_n & = \beta_1 \vec{m}_{n-1} + (1 - \beta_1) \pdiv{f}{\vec{x}} 
+						\\
+						\vec{v}_n & = \beta_2 \vec{v}_{n-1} + (1 - \beta_2)  \pdiv{f}{\vec{x}}   \odot \pdiv{f}{\vec{x}} 
+						\\
+						\vec{s}_n & = \vec{m}_n \oslash \sqrt{\vec{v}_n}
+					\end{align}
+
+					My general experience is that the Hadamard product generally only appears in situations where vectors are being used to simplify group operations, rather than in cases where vector algebra is being used. In ADAM, for instance, each element of the vector is being updated independently, even though the gradient is technically a vector object; the update formula is using each element of the vector as its `own thing', rather than as a valid vector component. 				
+					
+				\subsubsection{Cross Product}
+					
+					The Cross Product, like the Elementwise product, takes two vectors of dimension $N$, and returns a third $N$ dimensional vector:
+					$$\vec{a} \times \vec{b} = \vec{c} $$
+					This has some weird properties -- it is anti-commutative, so $\vec{b} \times \vec{a} = - \vec{a} \times \vec{b}$, which is a bit weird. 
+
+					Importantly for our purposes, the Cross Product is only meaningful for Vectors in 3D space, where there is a reasonable geometric interpretation. There are generalisations to higher dimensions and arbitrary vector spaces (using the lovely {Levi-Cevita tensor}). If you are not trying to do physics or computer graphics where surface normals are of the highest concern, you never need to think about the cross product.
+
+				\subsubsection{Dot/Inner Product}
+
+					The Dot product (also called the inner product) is a meaningful operator on almost every vector we will encounter\footnote{Very few interesting Vector Spaces for us cannot be turned into an Inner Product space.}. The dot product is a mapping between the vector space, and a scalar, and is usually defined as follows.
+
+					\begin{align}
+						\begin{pmatrix}
+							a \\ b \\ c
+						\end{pmatrix} \cdot \begin{pmatrix}
+							d \\ e \\ f
+						\end{pmatrix} = ad + be + cf
+					\end{align}
+
+					The dot product is, technically speaking, the special inner product on $\mathbb{R}^n$, normal Euclidean space: $\langle \vec{a}, \vec{b} \rangle = \vec{a}\cdot\vec{b}$. However, there is almost always a generalised Inner Product which looks and behaves like the dot product when our vectors are projected into column vector format. 
+
+					Again, it is worth reiterating because dot products form a vital part of Machine Learning: \textbf{when you take the dot product of two vectors, you multiply elementwise, then take the sum}. That's all it is.
+			\section{Linear Operators}
+
+				Before we move on to talk about Matrices, it is first useful to first stop by and discuss Linear Operators. 
+
+				A Linear Operator is an abstract mathematical object which `\textbf{does something}' to a vector. What this  `something' is, is left vague and undefined; Linear Operators are essentially special functions which obey some additional rules -- and which use slightly different notation. 
+
+				An operator acts on a vector space of $N$ dimensions, but can output vectors of any dimension. 	All that matters is that any linear operator $\hat{M},\hat{N}$ has to obey the following rules:
+				\begin{align}
+					\hat{M} (\vec{x} + \alpha \vec{y}) & = \hat{M} \vec{x} + \alpha \hat{M}\vec{y} 
+					\\
+					(\hat{M} + \hat{N})\vec{x} & = \hat{M}\vec{x} + \hat{N} \vec{x}
+					\\
+					\hat{M} \Big( \hat{N} \vec{x}\Big) & = \Big( \hat{M} \hat{N} \Big) \vec{x}
+				\end{align}
+				
+				\textbf{However}, note that it is not a requirement (and will not be true in general) that $\hat{M}\hat{N} = \hat{N}\hat{M}$, operators do not commute. This can be fairly trivially seen: the operator `put on your shoes' and `put on your socks' obviously matter which order you do them!
+
+				This seems obvious when expressed like this; it is, however, a different matter to remember when you have algebra on the page that you can't simply swap the order of things like you can with scalars!
+
+			\section{Matrices} \label{S:Matrices}
+
+				In chapter \ref{Int:Matrices}, I demonstrate the simple fact that \textit{matrices are linear operators}. This is their most important definition. A matrix -- in mathematical terms -- is a way of representing a linear operator in the same projection space that you are representing your vectors. 
+
+				That is, if you are dealing with `abstract vectors', then you have to work with `abstract operators'. If you have turned your vectors into column vectors, however, then you have also turned all of your operators into matrices. 
+
+				When you perform this `projection', these abstract `mappings from an $n$ dimensional vector space into an $n$ dimensional vector space' become a \textit{grid of numbers} -- and the size of that grid is $m$ rows by $n$ columns: this is not a coincidence!
+
+				If $m = n = 2$, then:
+				\begin{equation}
+					M = \begin{pmatrix}
+						a & b \\ c & d
+					\end{pmatrix}
+				\end{equation}
+				Where $a, b, c $ and $d$ are scalar values. 
+
+				\subsection{Matrix Algebra}
+
+					Matrices of the same size can trivially be added and it works as you might expect: elementwise
+					\begin{equation}
+						\begin{pmatrix}
+							a & b \\ c & d
+						\end{pmatrix} + \begin{pmatrix}
+							e & f \\ g & h
+						\end{pmatrix} = \begin{pmatrix}
+							a+e & b+f \\ c+e & d+h
+						\end{pmatrix}
+					\end{equation}
+					You can also multiply a matrix by a scalar with similar results:
+
+					\begin{equation}
+						\alpha \begin{pmatrix}
+							a & b \\ c & d
+						\end{pmatrix} = \begin{pmatrix}
+							\alpha a & \alpha b \\ \alpha c & \alpha d
+						\end{pmatrix}
+					\end{equation}
+
+				
+					
+				\subsection{Applying A Matrix To A Vector}
+
+					This is what we're all here for. Matrices are linear operators, which are defined via their `acting on' vectors. Given a matrix $M$ and a vector $\vec{v}$, what is the result? In short, if $\vec{u} = M \vec{v}$, what is $\vec{u}$?
+
+					Formally speaking, if $M_{ab}$ is the element of $M$ in row $a$ and column $b$, then the $i^\text{th}$ element of $\vec{u}$ is:
+					\begin{equation}
+						u_i = \sum_j M_{ij} v_j
+					\end{equation}
+					This can be a little hard to understand in the abstract -- but it is the definition which is used in `ludicrously high dimensions' when visualising it is impossible. If you are in low dimensions, you can do the following:
+					\begin{equation}
+						\begin{pmatrix}
+							\color{blue} a & \color{blue} b & \color{blue} c
+							\\
+							\color{red} d & \color{red} e & \color{red} f
+							\\
+							\color{green} g & \color{green} h & \color{green} i
+						\end{pmatrix} \begin{pmatrix} x \\ y \\ z \end{pmatrix} = \begin{pmatrix} {\color{blue}\begin{pmatrix} a \\ b \\ c\end{pmatrix}} \cdot\begin{pmatrix} x \\ y \\ z \end{pmatrix}\\{\color{red}\begin{pmatrix} d \\ e \\ f\end{pmatrix}} \cdot\begin{pmatrix} x \\ y \\ z \end{pmatrix}\\{\color{green}\begin{pmatrix} g \\ h \\ i\end{pmatrix}} \cdot\begin{pmatrix} x \\ y \\ z \end{pmatrix} \end{pmatrix} 
+						 = \begin{pmatrix} ax + by + cz \\ dx + ey + fz \\ gx + hy + iz \end{pmatrix}
+					\end{equation}
+					That is, matrix multiplication can be though of as using each row of the matrix to perform a dot product with your `target vector'. The dimension of your output vector is therefore obviously equal to the number of rows in your matrix; this is the number of dot products you are performing.
+				
+				\subsection{Matrix Multiplication}
+
+					You can also multiply matrices by other matrices. This follows the same procedure as above, but repeated over multiple rows:
+
+					\begin{equation}
+						\begin{pmatrix}
+							\color{blue} a & \color{blue} b 
+							\\
+							\color{red} c & \color{red} d
+							\\
+							\color{green} e & \color{green} f
+						\end{pmatrix} \begin{pmatrix}
+							\color{orange} g & \color{purple} h 
+							\\
+							\color{orange} i & \color{purple} j
+						\end{pmatrix}  = \begin{pmatrix}
+							{\color{blue} \begin{pmatrix} a \\ b \end{pmatrix}} \cdot {\color{orange}\begin{pmatrix} g \\ i \end{pmatrix}} & {\color{blue} \begin{pmatrix} a \\ b \end{pmatrix}} \cdot {\color{purple}\begin{pmatrix} h \\ j \end{pmatrix}}
+							\\
+							{\color{red} \begin{pmatrix} c \\ d \end{pmatrix}} \cdot {\color{orange}\begin{pmatrix} g \\ i \end{pmatrix}} & {\color{red} \begin{pmatrix} c \\ d \end{pmatrix}} \cdot {\color{purple}\begin{pmatrix} h \\ j \end{pmatrix}}
+							\\
+							{\color{green} \begin{pmatrix} e \\ f \end{pmatrix}} \cdot {\color{orange}\begin{pmatrix} g \\ i \end{pmatrix}} & {\color{green} \begin{pmatrix} e \\ f \end{pmatrix}}  \cdot {\color{purple}\begin{pmatrix} h \\ j \end{pmatrix}} 
+						\end{pmatrix}= \begin{pmatrix} ag + bi & ah + bj \\ ag + di & ch + dj \\ eg + fi & eh + fj \end{pmatrix}
+					\end{equation}
+					In formal language, the product $AB$ produces a third matrix $C$, which has elements:
+					\begin{equation}
+						C_{ij} = \sum_k A_{ik} B_{ki}
+					\end{equation}
+
+					If $A$ has dimensions $\ell \times m$\footnote{$\ell$ rows and $m$ columns} and $B$ has dimensions $m \times n$, then the output vector has dimensions $\ell \times n$.
+
+					\textbf{Matrix multiplication is not commutative!} It is not true that $AB = BA$ except in very rare circumstances. You have to be careful of the order you multiply matrices.
+
+					Recall, however, that by the definition of a linear operator, it is perfectly possible to chain any arbitrary number of matrices together, provided that they all have the correct number of dimensions.
+
+					\begin{equation}
+						A = BCDEFGHIJK
+					\end{equation}
+					If $B$ has dimensions $a \times b$, and $K$ has dimensions $c \times d$ (and all the inner matrices have appropriate complementary dimensionality); the final dimensionality of this is $a \times d$.
+
+					That is, even if $E$ has 10,000 $\times 10,000$ dimensionality; that is largely irrelevant for the final value. This will turn out to be of vital importance for Machine Learning...
+				\subsection{Matrix Transpose}
+					The \textit{transpose} of a matrix is the result of pivoting it about the leading diagonal. This converts $m\times n$ matrices into $n \times m$ matrices:
+
+					\begin{equation}
+						\begin{pmatrix}
+							a & b \\  c & d
+							\\
+							e & f
+						\end{pmatrix}^\intercal = \begin{pmatrix}
+							a & c & e \\ b & d & f
+						\end{pmatrix}
+					\end{equation}
+					Transpose have the following effect on matrix products:
+					\begin{equation}
+						(AB)^\intercal = B^\intercal A^\intercal
+					\end{equation}
+					A symmetric matrix is one which 
+					\begin{equation}
+						A^\intercal = A
+					\end{equation}
+				
+				\subsection{Interpreting Vectors as Matrices}
+
+					It is possible to treat an $m$ dimensional column vector as a $m \times 1$ dimensional matrix -- much of the same algebra applies. 
+					
+					
+
+					For instance, it is common write the dot product of two vectors as:
+					$$\vec{a} \cdot \vec{b} = \vec{a}^\intercal \vec{b}$$
+					This makes it easy to prove things such as:
+					$$ \vec{a} \cdot \left(M \vec{b}\right) = \left(M^\intercal \vec{a} \right) \cdot \vec{b}$$
+					
+					When you start treating vectors in this fashion, what you are doing is treating them as `dot product operators' the vector $\vec{v}$ becomes the operator which, when applied to $\vec{u}$ computes $(\vec{v}^\intercal \cdot \vec{u})$. Formally speaking, switching between treating vectors as $m \times 1$ matrices and back is a weird operation that you have to take care with. In practice, however, it works fine. 
+
+					Weirdly, however, \verb|numpy| does draw a strong distinction between objects of dimension \verb|(n,)| (a vector) and \verb|(n,1)| (a matrix) -- sometimes internal functions will work fine when given either; sometimes you will have to use a \verb|reshape| command to explicitly switch between them. It can be a bit weird!
+
+		
+		\chapter{Multivariable \& Vector Calculus}
+
+			The above section made the assumption that $f$ was only ever a function of one variable, a single scalar. That is clearly a limitation; we are going to want to do calculus with many dozens, if not thousands of parameters!
+			
+			
+			What if, let's say, we go truly nuts, and have:
+			\begin{equation}
+				f(x,y) = x^2 + 3xy
+			\end{equation}
+			% Or 
+			% \begin{equation}
+			% 	f(\vec{x}) = \vec{x} \cdot \vec{x} \left(\vec{x} - 2\right)
+			% \end{equation}
+			How can we possibly deal with such things?
+	
+			The solution is: just do what you did before with $x$, but pretend $y$ is a constant. And then reverse it; pretend $x$ is a constant and take the derivative with respect to $y$:
+			\begin{align}
+				\left(\pdiv{f}{x} \right)_y& = 2x + 3 y
+				\\
+				\left(\pdiv{f}{y}\right)_x & = 3 x
+			\end{align}
+	
+			We can see that, instead of our previous notation of $\div{f}{x}$, we have switched to this new symbol, $\partial$. That is because this is no longer a full derivative; it is a \textit{partial derivative}. The brackets and the subscript are there to remind us `what we kept constant' -- formally speaking, we should always include those, because a partial derivative is only meaningful if accompanied by information about what was `partial' about it. In practice, however, it is almost always `obvious', and so we can omit this notation -- you only really need to keep them around when you're dealing with a subset of a larger set of variables which are all interrelated in some way. The classic case of `you will go insane if you don't use the full notation' is Thermodynamics, where pressure ($P$), temperature ($T$), entropy ($S$), free energy ($E$) and are all interrelated -- so $\left(\pdiv{E}{T} \right)_P$ is a completely different beast than $\left(\pdiv{E}{T}\right)_S$. 
+
+			For what we're dealing with, however, we can ignore this; it suffices merely to note that, if you have a function $f(x_1,x_2,x_3,...)$ where $x_i$ are all free, independent variables, then taking partial derivatives is equivalent to simply `holding the others constant' and taking the derivative as you would in single variable calculus. 
+
+			It really is that simple (for now!)
+	
+	
+			\subsubsection{What's That About Vectors?}
+	
+				Because I don't have time to go into the full ins and outs of the difference between multivariable calculus, and calculus of a single variable where that variable happens to be a multidimensional vector, I am playing slightly fast and loose with the terminology and formalism. 
+	
+				In short, I am making the assumption that:
+				$$f(x,y,z) = f\left( \begin{pmatrix} x \\ y \\ z \end{pmatrix} \right)$$
+	
+				This is not always the case; and this mapping is not strictly 1:1. For instance, strictly speaking, Multivariable Calculus does not require the similar relationships under addition and linear transformations that Vector Calculus implies -- there are many pathological examples you can concoct where the difference between $f(x,y,z)$ and $f\left( \begin{pmatrix} x & y & z \end{pmatrix}^\intercal \right)$ actually matters. 
+	
+				This is not one of those times. 
+	
+				Broadly speaking, we can use vector calculus and multivariable calculus as synonymous and interchangeable -- a simple matter of `packaging up' and notation.
+
+
+			Almost all of the other rules still apply; so long as you remember to hold the other variables constant whilst you do so. 
+
+		\section{Derivatives of Vectors}
+
+			The simplest case for vector calculus is where a vector $\vec{v}$ is a function of a single variable; the classic case is position as a function of time, $\vec{x}(t)$. When we differentiate this with respect to time, the result is simply:
+
+			\begin{equation}
+				\div{}{t} \vec{x}(t) = \div{}{t} \begin{pmatrix} x_1(t) \\ x_2(t) \\ x_3(t) \\ x_4(t) \\\vdots \end{pmatrix} = \begin{pmatrix} \div{x_1}{t} \\ \div{x_2}{t} \\ \div{x_3}{t} \\ \div{x_4}{t} \\ \vdots \end{pmatrix}
+			\end{equation}
+
+			Note that, in this case, because there is only one variable to take the derivative of, I have switched back to using $\d$, rather than $\partial$. We generally won't need this for Machine Learning Applications.
+
+		\section{The Vector Derivative}
+
+			Let us now assume that we have a function $f(\vec{x})$, where $\vec{x}$ is some list of $N$ parameters. We have already seen how we might compute, for instance $\pdiv{f}{x_1}$ (we hold all other $x_i$ constant, and take the derivative as normal). However, you will often see things like this:
+			\begin{equation}
+				\pdiv{f}{\vec{x}} ~~~\text{or}~~~ \nabla f
+			\end{equation}
+			These two notations should be understood to mean:
+			\begin{equation}
+				\pdiv{}{\vec{x}} = \nabla = \begin{pmatrix} \pdiv{}{x_1} \\ \pdiv{}{x_2} \\ \pdiv{}{x_3} \\ \vdots \end{pmatrix}
+			\end{equation}
+			In short, this is a shorthand way of saying `do each individual partial derivative, and then package the results up into a vector'. For instance, if we have:
+			\begin{equation}
+				f(\vec{x}) = f(x,y,z) = x^2 \sin(z) - xyz 
+			\end{equation}
+			Then:
+			\begin{equation}
+				\pdiv{f}{\vec{x}} = \begin{pmatrix} 2x \sin(z) - yz \\ -xz \\ x^2 \cos(z) - xy \end{pmatrix}
+			\end{equation}
+			Just as the single-dimensional derivative told us the gradient of the curve, this is a generalisation of the gradient to higher dimensions; not only does it's magnitude tell us the steepness of the function, but it points in the direction of the greatest increase. Following this gradient will, just as it did in the single-variable case, take us towards the nearest local peak; whilst walking in the opposite direction will take us to the local minima.
+		
+		\section{The Chain Rule}
+
+			The multivariate chain rule is of critical importance for our work in machine learning. Let us first consider the simplest case; a scalar-valued function which is a function of a vector, but where the vector is itself a simple function of one variable. 
+
+			For instance:
+			\begin{equation}
+				y = f(\vec{x}(t))
+			\end{equation}
+			Here $\vec{x}$ might be the position in 3D space, and so $f$ requires three dimensions -- if we specify a path which is followed as a function of time, then we actually only have to specify what the current time is to know $y$. 
+
+			What, therefore, is $\div{y}{t}$?
+
+			To find this out, we use the \textit{total derivative} of $f$. When we write the total derivative of a function, you get:
+
+			\begin{spalign}
+				\d f(\vec{x}) & = \pdiv{f}{x_1} \d x_1 + \pdiv{f}{x_2} \d x_2 + \hdots 
+					\\	 
+					& = \sum_i \pdiv{f}{x_i} \d x_i
+					\\
+					& = \pdiv{f}{\vec{x}} \cdot \d \vec{x}
+			\end{spalign}
+			We can then do the thing which makes mathematicians cry, and `divide by $\d t$', to find:
+
+			\begin{equation}
+				\div{f}{t} = \pdiv{f}{\vec{x}} \cdot \div{\vec{x}}{t}
+			\end{equation}
+
+			% If $f$ were itself a vector-valued function, we would find:
+
+			% \begin{equation}
+			% 	\div{\vec{f}}{t} = \left(\pdiv{\vec{f}}{\vec{x}}\right)^\intercal \div{\vec{x}}{t}
+			% \end{equation}
+			% Where:
+			% \begin{equation}
+			% 	\pdiv{\vec{f}}{\vec{x}} = J_{\vec{f}} = \begin{pmatrix} \pdiv{f_1}{x_1} & \pdiv{f_1}{x_2} & ... & \pdiv{f_1}{x_n} \\ \pdiv{f_2}{x_1} & ... \\ \vdots \\ \pdiv{f_m}{x_1} & ... & & \pdiv{f_m}{x_n} \end{pmatrix}
+			% \end{equation}
+			% Why is this written in such a way that we need to Transpose it? Why not just define it already-transposed? The answer is that this entity -- the Jacobian matrix -- appears in lots of different places, most of which where the above definition is most convenient, and so the Chain Rule gets stuck with a weird transpose.
+
+			These leads us to the final case; where $\vec{x}$ is not a function of a nice scalar, but of another vector:
+			\begin{equation}
+				y = f(\vec{x}(\vec{u}))
+			\end{equation}
+			Surprisingly, however, this is surprisingly easy (because we've done the hard work of packaging things into nice notation)
+			\begin{equation}
+				\pdiv{f}{\vec{u}} = \pdiv{\vec{x}}{\vec{u}}^\intercal \pdiv{f}{\vec{x}}
+			\end{equation}
+			Where
+			\begin{equation}
+					\pdiv{\vec{x}}{\vec{u}} = J_{\vec{x}} = \begin{pmatrix} \pdiv{x_1}{u_1} & \pdiv{x_1}{u_2} & ... & \pdiv{x_1}{u_n} \\ \pdiv{x_2}{u_1} & ... \\ \vdots \\ \pdiv{x_m}{u_1} & ... & & \pdiv{x_m}{u_n} \end{pmatrix}
+				\end{equation}
+				Why is this written in such a way that we need to Transpose it? Why not just define it already-transposed? The answer is that this entity -- the Jacobian matrix -- appears in lots of different places, most of which where the above definition is most convenient, and so the Chain Rule gets stuck with a weird transpose.
+			
+		
+				Naturally things can get \textit{way} more complicated here, but the general gist is that multivariable calculus isn't \textbf{that} much different than normal calculus. 
+			% \section{Some Examples}
+
+			% 	The above notation makes it easy to package things up in arbitrary dimensions, but can make getting an intuitive hand on things more difficult.
+
+			% 	Some simple examples can make things seem less daunting. 
+
+			% 	\subsection{Vector-Function-Of-Scalars}
+
+			% 		A path travelling along a spiral path in 3D space has the following equation as a function of time:
+
+			% 		\begin{equation}
+			% 			\vec{x}(t) = \begin{pmatrix}
+			% 				r \cos(\omega t) \\ r \sin(\omega t) \\ v t
+			% 			\end{pmatrix}
+			% 		\end{equation}
+			% 		Here $\omega$ and $v$ describe the cyclical speed and vertical speed respectively, and $r$ is the radius of the spiral. 
+
+			% 		The velocity of a particle following this path is simply the derivative of this with respect to time:
+
+			% 		\begin{spalign}
+			% 			\vec{v}(t) & = \pdiv{\vec{x}}{t} 
+			% 			\\
+			% 			& = \begin{pmatrix}
+			% 				-r \omega \sin(\omega t) 
+			% 				\\
+			% 				r \omega \cos(\omega t)
+			% 				\\
+			% 				v
+			% 			\end{pmatrix}
+			% 		\end{spalign}
+			% 		Nice and simple; we took the derivative of each component of the vector separately. 
+
+			% 	\subsection{Scalar-Function-Of-Vector}
+
+			% 		Let's consider the opposite case, now. A scalar function taking in vector inputs. An example might be:
+			% 		\begin{equation}
+			% 			f(\vec{x}) = \vec{a} \cdot \vec{x} 
+			% 		\end{equation}
+			% 		Here $\vec{a}$ is a constant. By considering each component of $\pdiv{}{\vec{x}}$ in turn, it is easy to show that:
+			% 		\begin{equation}
+			% 			\pdiv{}{\vec{x}} \vec{a} \cdot \vec{x} = \vec{a}
+			% 		\end{equation}
+			% 		A pleasingly simple result. Similarly:
+			% 		\begin{equation}
+			% 			\pdiv{}{\vec{x}} \vec{x} \cdot \vec{x} = 2 \vec{x}
+			% 		\end{equation}
+
+			% 	\subsection{Vector-Function-Of-Vector}
+
+			% 		This is one of the more complex cases. Let's consider the simplest possible case for now:
+			% 		\begin{equation}
+			% 			\vec{f} = a \vec{x}
+			% 		\end{equation}
+
+			% 		The result is:
+			% 		\begin{equation}
+			% 			\pdiv{a \vec{x}}{\vec{x}} = \begin{pmatrix}
+			% 				a & 0 & 0 & ... & 0\\ 0 & a & 0 & 
+			% 				\\ 0 & 0 & a 
+			% 				\\
+			% 				\vdots &&&\ddots
+			% 				\\
+			% 				0 & 0 & 0 & ... & a
+			% 			\end{pmatrix} = a I
+			% 		\end{equation}
+			% 		Where $I$ is the $n\times n$ identity matrix, such that $I \vec{v}  = \vec{v}$ for all $n$-dimensional $\vec{v}$.
+
+			% 		This is unsurprising; pattern recognition indicates that this should be a matrix, and we know that $\div{x}{x} = 1$, so this should result in the equivalent for $1$ for a matrix!
+
+			% 		A more complex case might be:
+			% 		\begin{equation}
+			% 			\vec{f} = \left( \vec{a} \cdot \vec{x} \right) \vec{x}
+			% 		\end{equation}
+			% 		We can immediately use the product rule to pull this apart:
+			% 		\begin{equation}
+			% 			\pdiv{f}{\vec{x}} = \left( \vec{a} \cdot \vec{x} \right) \pdiv{\vec{x}}{\vec{x}} + \left(
+			% 		\end{equation}
+		
+		\chapter{Numerical Optimisation}
+	
+			The above analysis of both single variable and multivariable calculus naturally lends itself to asking, therefore, how we may identify the maxima (or minima) of a function if analytically solving the derivative is impossible. 
+	
+			This is a field which is simultaneously both cutting edge, and ludicrously simple: some of the biggest and most recent `leaps forward' are trivial modifications of methods which have existed for centuries; that is to say, they are all \textit{first order} methods, which require only the ability to compute the gradient. In fact, many of these methods require \textit{only} that you be able to compute the gradient, and being able to compute the function is largely irrelevant. 
+	
+			For the following analysis, we shall assume that we are seeking the \textit{minimum} of the function; the \textit{maximum} can be found simply by inverting the sign on the step. 
+			
+			\section{Newton's Descent}
+				Newton's Descent finds the optima of a function by asking the very simple question: \textit{how do you navigate to the bottom of a hill?} The answer being, of course, \textbf{you walk downhill.} Provided you don't get caught in any wells or localised dips (i.e. local minima), you can always find the lowest point in a valley by walking in the direction which is steepest downhill. 
+	
+				After each step, you recompute the steepest direction, and take another step; recompute, and repeat. 
+	
+				This, in essence, is the underpinning of all first-order methods. 
+	
+				Given we start at a position $\vec{x}_0$, the position after each step is then given by:
+				\begin{equation}
+					\vec{x}_n = \vec{x}_{n-1} - \alpha \vec{d}_{n-1}
+				\end{equation}
+				Where $\vec{d}_n$ is the direction vector of the gradient:
+				\begin{equation}
+					\vec{d}_n = \frac{1}{\left|\pdiv{f}{\vec{x}}\right|} \pdiv{f}{\vec{x}}
+				\end{equation}
+				Why is the step direction negative? The gradient points \textit{up} the hill, and we want to walk \textit{downhill}, in order to minimize. If we were maximising, we would use a $+$ sign, and walk uphill. 
+	
+				The variable $\alpha$ is the step-size; it denotes how far you will move each time you compute the gradient. Naturally this has a problem because, if the optimum is at $\vec{x} = 0$, $\alpha = 1$ and you are at $\vec{x} = 0.5$, the gradient will tell you to to go backwards; to $\vec{x} = -0.5$, at which point the gradient will tell you to go forwards...to 0.5.
+				
+				This will repeat, ad infinitum; you will never, ever reach precisely the optimum; but with a suitable choice of $\alpha$ you can get close enough for all practical purposes.
+			
+			\section{Line Search}
+	
+				Na\"ive Newton's descent keeps $\alpha$ fixed, requiring human intervention to fine tune the optimisation -- if $\alpha$ is set too large, then the optimisation will only get `near to' the optimum, whilst if $\alpha$ is too small, convergence to the optimum will take significant computer power simply recomputing gradients which tell you to move in the same direction you were already moving!
+				
+				Line Search algorithms encompass those which try to automatically determine the suitable $\alpha$ each step. A simple Line Search algorithm would go something along the lines of:
+				
+				\begin{enumerate}
+					\item At $\vec{x}_n$, compute $\vec{d}_n$ and $y_n = f(\vec{x}_n)$. 
+					\item Let $\hat{\vec{x}} = \vec{x}_n - \alpha \vec{d}_n$ and $\ell = 1$ 
+					\item Compute $\hat{y} = f(\hat{\vec{x}})$. 
+					\begin{itemize}
+						\item If $\hat{y} < y_n$, then set $\vec{x}_{n+1} = \hat{\vec{x}}$
+						\item Let $\hat{\vec{x}} = \vec{x}_n - \frac{\alpha}{2^\ell} \vec{d}_n$ and $\ell \to \ell + 1$. Then go to step 3.
+					\end{itemize}
+				\end{enumerate}
+	
+				In this algorithm, rather than blindly stepping in the direction $\vec{d}$, we first check that this actually reduces the value of $y$ -- if it does, we move our usual step of length $\alpha$. If, however, it does not improve the score, we do not make the step; we instead decrease $\alpha$ by a factor of 2, and recompute the score at this new proposed position: we repeat this until either a set number of iterations is reached (and we move anyway), or we find a length scale that does decrease the score. 
+	
+				This allows us to keep $\alpha$ large for moving fast near the beginning of the optimisation. However, when we get close and a large $\alpha$ would be detrimental, the line search will ensure that we don't jump over the optimum. The cost of this is that we must compute $f(\vec{x})$, potentially multiple times for each step. If $f$ is a costly function, then this will dominate our optimisation times, making the routine take much longer. 
+	
+				Other line search and similar methods exist: the BFGS algorithm, for instance, attempts to estimate the correct value of $\alpha$ by approximating the Hessian (the second derivative matrix); essentially modelling the gradient as a quadratic, rather than straight line.
+				
+				All of these methods, however, take additional computation time which scales (usually) as $n^2$ or $n^3$ in the number of parameters; when you have many parameters to optimise and your function is costly to compute, these costs often mean that it is simply easier to use a simpler, less clever method, but run it for longer! This is often the case in Machine Learning applications, where the number of parameters exceeds hundreds to thousands; using the dumb-but-quick methods are often significantly more approachable, even though their mathematical accuracy and elegance would imply the opposite.
+	
+			\section{Momentum \& ADAM}
+	
+				One of the problems that the basic Newton Method faces is that it will readily get caught in local optima: the gradient has no way of informing you ``hey if you move $x \to x + 10$'' there's a way deeper valley than the one you're currently in!'' The gradient, after all, merely points towards (or away from) the nearest local optima.
+	
+				One way to overcome this, and also better estimate $\alpha$ when the optimiser is bouncing around trying to find things, is to use \textit{momentum}. In the analogy of `walking down a hill', this becomes more like `rolling a ball down a hill' -- it will generally roll downhill, but if it gets up enough speed, it will happily plow over smaller valleys.
+	
+				In this case, we have an additional parameter; the \textit{memory} of the optimiser,$\beta$. A simple momentum optimiser looks like, with $\vec{d}_0 = \vec{0}$:
+	
+				\begin{enumerate}
+					\item At $\vec{x}_n$, compute $\vec{d}_n$. 
+					\item $\vec{m}_n = \beta \vec{m}_{n-1} + (1 -\beta) \vec{d}_n$
+					\item Let $\vec{x}_{n+1} = \vec{x}_n - \alpha \vec{m}_n$
+				\end{enumerate}
+	
+				If $\beta = 0$, we can see that we recover the original Newton algorithm, otherwise we see that $\vec{m}$ is an exponentially weighted mean of the previously computed directions: if they all point in the same direction, then $\vec{m} \approx \vec{d}$, and it will move as expected with a step size of $\alpha$. If the gradient has recently switched directions (or gone to zero), then it follows that $|\vec{m}_{n}| < 1$, and so the step size will be (approximately) in the direction of the old gradients, but with a smaller step size. If the gradient keeps pointing in this new direction, it will veer back around and forget its old route -- if the gradient change was only a momentary fluctuation -- a bump in the road -- then it will keep on going. This also has the effect of damping out oscillations; if the optimiser is bouncing backwards and forwards either sides of the true optimum, the momentum term will ensure these `bounces' get smaller, and so the optimiser will converge on the true optimum.
+				
+				Empirically, on the kinds of problems that we are interested in solving, this algorithm often outperforms the naive Newton's method, even if it might initially seem perverse to deliberately ignore changes in the gradient!
+	
+				The ADAM optimiser (of Kingma \& Ba, 2012) is an update to this formula -- rather than simply keeping a momentum of the \textit{direction}, they attempt to simultaneously normalise the gradient and the second moment of the gradient. The result is that the model keeps a `per parameter' memory of it's prior performance, rather than risking having some parameters lost in the `direction gradient'; this can happen if your model's parameters have vastly different scales: if one changes on the scale of $10^{-1}$, whilst the other changes on the scale of $10^3$, the normalisation of the gradient can cause the smaller scale parameter to get lost. 
+				
+				\begin{enumerate}
+					\item At $\vec{x}_n$, compute the gradient, $\vec{g}_n = \div{f}{\vec{x}}$. 
+					\item Let:
+					\begin{itemize}
+						\item $\vec{m}_n = \beta_1 \vec{m}_{n-1} + (1 -\beta_1) \vec{g}_n$
+						\item $\vec{v}_n = \beta_2 \vec{v}_{n-1} + (1 - \beta_2) \vec{g}_n \otimes \vec{g}_n$
+						\item $c_1 = \left(1.0 - \beta_1^{n+1}\right)^{-1}$
+						\item $c_2 = \left(1.0 - \beta_2^{n+1}\right)^{-1}$
+					\end{itemize}
+	
+					\item Let the step be: $$\vec{s}_n = \alpha c_1 \vec{m}_n \oslash \sqrt{c_2 \vec{v}_n + \epsilon}$$
+					\item Let $\vec{x}_{n+1} = \vec{x}_n - \vec{s}_n$
+				\end{enumerate}
+				Here $\oslash$ is the Hadamard (element-wise) divisor, and the $\sqrt{\vec{v}}$ is assumed to the be vector where each element is the square root of the corresponding element of $\vec{v}$. The purpose of the $c_i$ terms is to un-bias the optimiser away from zero in the early stages of optimisation; without these the model is `slow off the mark' and can get biased. These corrections prevent that from altering the final value. The $\epsilon \approx 10^{-8}$ term is simply to stop division by zero should the gradient get close to the optimum, and hence $[\vec{v}]_i \ll 1$.
+	
+				This optimiser shows superior performance over many `more intelligent' routines; it is rather remarkable how this simple modification of Newton's algorithm from the 18th century is at the forefront of many modern ML applications!
+
+	\part{Interesting Discussions}
+	
+		\chapter{Introduction}
+
+			\large This section of the notes is intended to provide some deeper understanding for those who are interested, and perhaps connect some of the dots between the more abstract mathematics which was introduces in Part I, and the more familiar mathematics you might be familiar with. 
+
+			You should only read this section if you are already familiar with the background mathematics, and are interested to learn a bit more. 
+
+		\chapter{Polynomial Derivatives}\label{Int:Polynomial}
+
+			In the above analysis, we jumped straight from the formal definition of the derivative, straight to the familiar polynomial derivative rule:
+			\begin{equation}
+				\div{}{x} x^n = n x^{-1}
+			\end{equation}
+
+			How does one follow from the other? This is actually surprisingly complex. It is easy to show that it is true when $n$ is an integer since -- for these cases -- we can use the Binomial theorem:
+			\begin{equation}
+				\left(x + \delta\right)^n = x^n + n x^{n-1} \delta + \frac{n(n-1)}{2} x^{n-2} \delta^2 + a \delta^3  + b \delta^4 + \hdots
+			\end{equation}
+			Where $a, b, c\hdots$ are functions only of $n$ and $x$. If we insert this into the formal definition of the derivative, we find that:
+			\begin{spalign}
+				\div{}{x} x^n &= \lim_{\delta \to 0} \left( \frac{(x+ \delta)^n - x^n}{\delta }\right)
+				\\
+				& = \lim_{\delta \to 0} \left( \frac{\left[x^n + n x^{n-1} \delta + \frac{n(n-1)}{2} x^{n-2} \delta^2 + a \delta^3 + b\delta^4 + \hdots\right] - x^n}{\delta }\right)
+				\\
+				& = \lim_{\delta \to 0} \left( n x^{n-1} + \frac{n(n-1)}{2} x^{n-2} \delta + a \delta^2 + b \delta^3 + \hdots\right)
+			\end{spalign}
+			We see that all of the terms except the first are multiplied by a $\delta$, and so when we set $\delta =0$, they will vanish. The first term, however, remains:
+			\begin{equation}
+				\div{}{x} x^n = n x^{n-1}
+			\end{equation}
+			This, however, only works when $n$ is an integer, since this is the only case where the Binomial expansion holds (at least, until we can derive Taylor expansions, but we need polynomial derivatives to do that!)
+
+			This gets down to a bigger question: what does it mean to say $x^n$ when $n$ is not an integer? If $n$ is a rational number $n = \frac{p}{q}$, you can say that $x^n = \sqrt[q]{x^p}$; but what about $x^\pi$, an irrational number? How can you `multiply $x$ by itself $\pi$ times'? It turns out the easiest definition is simply the exponential function:
+			\begin{equation}
+				x^n = \exp\left(n \log(x)\right)
+			\end{equation}
+			Using the chain rule and the knowledge that $\div{}{x} \exp(x) = \exp(x)$ and $\div{}{x} \log(x) = x^{-1}$, we recover our familiar polynomial derivative immediately.
+
+		\chapter{The Real Definition of a Vector}\label{Int:VectorSpace}
+
+			The real definition of a vector $\vec{v}$ is that it must be a member of a Vector Space, $V$. In order for $V$ to be a vector space, all elements of $V$ must obey the following rules:
+
+			\begin{enumerate}
+				\item It must have a concept of `generalised addition', such that for members, $\vec{v}$ and $\vec{u}$ the `generalised sum' $\vec{v} + \vec{u} = \vec{w}$, and $\vec{w}$ is a member of the space. 
+				\item It must have a concept of `scalar multiplication', such that for $\vec{v}$ a member of the space and $\alpha$ a real or complex number, $\vec{w} = \alpha \times \vec{v}$ is a member of the space.
+				\item Addition is associative:
+				$$ \vec{u} + (\vec{v} + \vec{w}) = (\vec{u} + \vec{v}) + \vec{w}$$
+				\item Addition is commutative
+				$$\vec{u} + \vec{v} = \vec{v} + \vec{u}$$
+				\item There is an identity element for addition; a vector $\vec{0}$ which does nothing when added:
+				$$ \vec{v} + \vec{0} = \vec{v}$$
+				\item Each element has an additive inverse $(-\vec{v})$ which is in $V$, such that:
+				$$ \vec{v} + (-\vec{v}) = \vec{0}$$
+				\item Scalar multiplication has an identity, $1$, which when multiplied does nothing:
+				$$ 1 \times \vec{v} = \vec{v} $$
+				\item Scalar multiplication is distributive with respect to vector addition
+				$$ a \times (\vec{v} + \vec{w}) = a \vec{b} + a \vec{w}$$
+				\item Scalar multiplication is distributive with respect to field addition
+				$$ (a + b) \vec{v} = a \vec{v} + b \vec{v}$$
+			\end{enumerate}
+
+			Some of these seem supremely obvious, but the point is that \textit{any} object, and \textit{any} operation you care to call `addition' can therefore be used to form a vector space. 
+
+			\section{Some Weird Examples}
+
+				\subsection{The Positive Numbers}
+
+					It might initially seem that, by definition, the positive numbers cannot be a Vector space. After all, the additive inverse of $2$ is $-2$ which is not in the space, and so we fail the additive inverse condition. 
+
+					This, however, ignores the fact that we can redefine addition and multiplication as we like! Let us define the `positive addition' to be:
+					$$ \vec{a} \oplus \vec{b} = a\times b $$
+					The scalar multiplication is then:
+					$$ n \vec{a} = a^n$$
+					We can see that so long as $a,b > 0$, then $a\times b > 0$, and $a^n > 0$ for any $n$. The additive inverse of $2$ is, weirdly, $\frac{1}{2}$, and the zero vector is actually 1.
+					
+					These therefore satisfy the conditions for our generalised addition and multiplication. It is possible to work through the above list and show that it does indeed hold true for all of the relationships; and so the positive numbers can be a Vector Space.   
+
+		\chapter{Vectors And Angles}\label{Int:Angles}
+
+			The existence of the inner product is where the definition 'a vector is a quantity with direction and magnitude' comes from since, thanks to the Cauchy-Schwarz Inequality:
+			\begin{equation}
+				\inner{a}{b}^2 \leq \inner{a}{a} \inner{b}{b}
+			\end{equation}
+			In fact, we can strengthen this further if we forbid $\vec{a}$ from being a scalar multiple of $\vec{b}$:
+			\begin{equation}
+				\inner{a}{b}^2 <  \inner{a}{a} \inner{b}{b} \text{ iff } \vec{a} \neq x \vec{b}
+			\end{equation}
+			That is, $\inner{a}{b} = \sqrt{ \inner{a}{a} \inner{b}{b}}$ is only possible if $\vec{a}$ is just a rescaling of $\vec{b}$. I've used the general $\inner{a}{b}$ form to emphasise that this is a general property of a 'true inner product', not just of the dot product.  
+
+			It is this property that lets us define the \textbf{length} of a vector as:
+			\begin{equation}
+				L(\vec{a}) = \sqrt{\inner{a}{a}}
+			\end{equation}
+			From the Cauchy-Schwarz Inequality, we than have:
+			\begin{equation}
+				\inner{a}{b}^2 \leq L(\vec(a)) L(\vec{b}) ~~~~~~ \Longrightarrow ~~~~~ -1 \leq \frac{\inner{a}{b}}{\sqrt{L(\vec{a}) L(\vec{b})}} \leq +1
+			\end{equation}
+
+			An alternative way to write this:
+			\begin{equation}
+				\frac{\inner{a}{b}}{\sqrt{L(\vec{a}) L(\vec{b})}}  = f(\vec{a},\vec{b})~~~~~~~ -1 \leq f(\vec{a},\vec{b}) \leq 1
+			\end{equation}
+			This mysterious $f$ is:
+			\begin{itemize}
+				\item A function of the two vectors
+				\item Equal to 1 when the vectors are equal
+				\item Always between -1 and 1, no matter what values $\vec{a}$ and $\vec{b}$ are
+			\end{itemize}
+			This function looks an awful lot like a cosine! We therefore define the angle between two vectors as:
+			\begin{equation}
+				\theta(\vec{a},\vec{b}) = \text{arccos}\left(\frac{\inner{a}{b}}{\sqrt{L(\vec{a}) L(\vec{b})}} \right)
+			\end{equation} 
+			This is the abstract definition of the angle between two vectors -- and it applies even in some wacky cases. 
+
+			Consider the vector space of real functions, so $\vec{a} = x$ and $\vec{b} = 2x - 3x^3$. We can define an inner product as:
+			\begin{equation}
+				\inner{a}{b} = \int_{-\infty}^{\infty} \exp(-x^2) a(x) b(x) \d x
+			\end{equation}
+			Then:
+			\begin{alignat*}{2}
+				L(\vec{a})& =\sqrt{ \int_{-\infty}^{\infty} \exp(-x^2) x^2 \d x } &&= \frac{\sqrt[4]{4\pi}}{2}
+				\\
+				L(\vec{b})& = \sqrt{\int_{-\infty}^{\infty} \exp(-x^2) (2x - 3x^3)^2 \d x} &&= \frac{\sqrt[4]{24964\pi}}{4}
+				\\
+				\inner{a}{b} & = \int_{-\infty}^{\infty} \exp(-x^2) x(2x - 3x^3) \d x &&= - \frac{5 \sqrt{\pi}}{4}
+				\\
+				\theta & = \text{arccos}\left(- \frac{5}{\sqrt{79}}\right) && = 124.2^\circ
+			\end{alignat*}
+			Thus we have meaningfully defined an angle between two random functions! This isn't relevant for what we're doing, it's just fun and weird.
+
+		\chapter{Matrix Multiplication}\label{Int:Matrices}
+
+			In section \ref{S:Matrices}, we made the jump from `Linear Operators have certain behaviours' to `matrices are grids which multiply like this' with a wave of the hand and a `trust me I know what I'm doing'.  Why is this connection true? Why does matrix multiplication work the way it does? How and why is this `the way things are done'?
+
+			This section aims to derive the matrix multiplication rules from nothing more than the behaviour of linear operators. 
+
+			We first consider that, when we write our vectors in a nice column vector, what we're doing (behind the scenes) is writing the vector as a \textbf{sum of basis vectors}:
+			\begin{equation}
+				\vec{v} = \begin{pmatrix}
+					a \\ b \\ c
+				\end{pmatrix} = a \hat{e}_1 + b \hat{e}_2 + c \hat{e}_3
+			\end{equation}
+			The entry in each element of the vector means `I have $a$ amount of $\hat{e}_1$, this much of $\hat{e}_2$, and this much of $\hat{e}_3$'. Generally, we have taken care to write our basis vectors in a linearly independent fashion; that is, such that saying `I have 3 lots of unit $\hat{e}_1$', tells me nothing about how much $\hat{e}_3$ I have.
+
+			In a `normal' 3D vector, we'd be familiar that $[3,2,1]^\intercal$ would mean `3 units of $x$ distance, 2 of $y$ and 1 of $z$; but if (for some reason), we decided to make our vector also be $[3,2,1,d]$ where $d$ was the distance from some point of interest, we've violated this assumption, since $d$ could already be computed from the position, so it is not linearly independent.
+
+			Since this is a horrible state of affairs, we will assume from now on that our basis is indeed independent in the above fashion. 
+
+			If this is true, then it is also true that $\hat{e}_1 \cdot \hat{e}_2 = 0$ and $\hat{e}_3 \cdot \hat{e}_1 = 0$; the basis vectors are necessarily at right angles to each other. This is important! If you do not have an orthogonal basis set, the mathematics becomes horribly complicated. Most of quantum physics is about searching for a nice orthogonal basis set, and abusing that for all it's worth. 
+
+			We can therefore always write a general, $N$ dimensional vector in terms of $N$ orthogonal bases (this is, in fact, a good definition of `dimension'; the minimum number of vectors in a basis set):
+			\begin{equation}
+				\vec{v} = \sum_i a_i \hat{e}_i = \begin{pmatrix}
+					a_1 \\ a_2 \\ a_3 \\ \vdots
+				\end{pmatrix}
+			\end{equation}
+			We can also pull a little trick to rewrite our vector, since $\hat{e}_i \cdot \hat{e}_j = 0$ if $i \neq j$, but 1 if $i = j$, so:
+			\begin{equation}
+				\vec{v} \cdot \hat{e}_i = a_i ~~~~~~~\Longrightarrow~~~~~~ \vec{v} = \sum_i (\vec{v} \cdot \hat{e}_i) \hat{e}_i \label{E:Decompose}
+			\end{equation}
+			One final trick, before we're ready to put the pieces together. We now consider the 'identity operator'. This operator is the operator which does nothing - it multiplies a vector by 1, leaving behind the original vector:
+			\begin{equation}
+				\hat{I} \vec{v} = \vec{v}
+			\end{equation}
+			We can write $I$ in a very strange way:
+			\begin{equation}
+				\hat{I} = \sum_i \hat{e}_i  \left( \hat{e}_i \cdot \circ \right)
+			\end{equation}
+			What this means is, when we multiply $I$ by a vector, we insert the vector wherever we see the $\circ$, and therefore into the dot product:
+			\begin{equation}
+				\hat{I} \vec{v} = \sum_i \hat{e}_i  (\hat{e}_i  \cdot \vec{v} )
+			\end{equation}
+			By comparison with Eq. \ref{E:Decompose}, however, this is just exactly equal to $\vec{v}$. This unusual way of writing the identity operator will help us clarify things, since we can always multiply by the identity, and leave everything unchanged. 
+
+			We now consider the operator $\hat{M}$, acting on a vector $\vec{v}$. Since matrices are linear operators:
+			\begin{align}
+				\hat{M} \vec{v} & = \hat{M} \left( \sum_i (\hat{e}_i  \cdot \vec{v} ) \hat{e}_i \right)
+				\\
+				& = \sum_i (\hat{e}_i  \cdot \vec{v} )  \hat{M} \hat{e}_i
+			\end{align}
+			Where we remember that $(\hat{e}_i  \cdot \vec{v} ) = a_i$ is just the element in the column vector, written in a strange form. We can now multiply by the Identity operator (but have to sum over $j$ since $i$ is already taken!)
+			\begin{align}
+				\hat{I} \hat{M} \vec{v} & = \hat{M} \vec{v} 
+				\\
+				& = \sum_j \hat{e}_i \left( \hat{e}_j \cdot \left[\sum_i (\hat{e}_i  \cdot \vec{v} )  \hat{M} \hat{e}_i\right]\right)
+			\end{align}
+			However, this is once again a dot product (and the dot product is still linear!), so:
+			\begin{align}
+				\hat{M} \vec{v} & = \sum_j \hat{e}_j \left( \hat{e}_i \cdot \left[\sum_i (\hat{e}_i  \cdot \vec{v} ) \hat{M} \hat{e}_i\right]\right) 
+				\\
+				& = \sum_j \hat{e}_j \sum_i (\hat{e}_i \cdot \vec{v}) \hat{e}_j \cdot \hat{M} \hat{e}_i
+			\end{align}
+			However, we expect $\hat{M} \vec{v}$ to be an entirely new vector, $\vec{u}$, where $\vec{u}$ is defined as:
+			\begin{equation}
+				\hat{M}\vec{v} = \vec{u} = \sum_j b_j \hat{e}_j
+			\end{equation}
+			By comparison, we see that:
+			\begin{align}
+				b_j &  =  \sum_i (\hat{e}_i  \cdot \vec{v} ) \left[\hat{e}_j \cdot \hat{M} \hat{e}_i \right]
+				\\
+				& = \sum_i a_i M_{ji}
+			\end{align}
+			Where $M_{ji} = \left[\hat{e}_j \cdot \hat{M} \hat{e}_i \right]$.
+			If we write this out fully, we find:
+			\begin{equation}
+				\vec{u} = \begin{pmatrix} M_{1,1} a_1 + M_{1,2} a_2 + \dots 
+					\\
+					M_{2,1} a_1 + M_{2,2} a_2 + \dots 
+					\\
+					\vdots
+					\\
+					M_{N,1} a_1 + M_{N,2} + \dots\end{pmatrix} \label{Eq:MatMult}
+			\end{equation}
+
+			It is clear that $\hat{M}$ can be represented as a grid of numbers, a \textit{matrix} $M$, such that:
+			\begin{equation}
+				M = \begin{pmatrix}
+					M_{11} & M_{12} & M_{13} & \dots
+					\\
+					M_{21} & M_{22} & M_{23} & \dots
+					\\
+					& & \vdots & 
+					\\
+					M_{N1} & M_{N2} & M_{N3} & \dots
+				\end{pmatrix}
+			\end{equation}
+			If matrix multiplication is carried out using the rules described in \ref{S:Matrices}, then we recover Eq. \ref{Eq:MatMult}, and, by definition, all of the behaviours of linear operators. This is `why matrix multiplication is the way that it is'; we have derived that general linear operators can be represented as a 2D grid of numbers, with a specific pattern of multiplication; using only the fact that they must obey certain linear operator rules.
+		\chapter{A Tiny, Tense Tangent on Tensors}
+
+			``Tensors'' are a huge thing in machine learning -- Google have gone all in on this, producing \verb|TensorFlow| and their TPUs, `Tensor Processing Units' which are now being mass produced.
+
+			So, what is a Tensor?
+
+			The theoretical physicist inside of me wants to tell you a dirty secret; something \textit{they} don't want you to know. \textbf{Tensors are lies!}
+
+
+			That is, what Machine Learning calls a tensor is in fact merely a series of data structures - an $M$-array. A common example is a colour image - each image is a $N\times N$ grid\footnote{Which some people call matrices -- but you know better now, because a matrix is a Linear Operator, and an image is not an operator (at least, not until you redefine your Vector Space!)}, but there are 3 channels (one each for RGB). We could just unwind this into a $3N^2$ long vector of values, but to preserve the relative information within, it is more useful to preserve it as a multidimensional data structure.
+
+			\textbf{This is not a Tensor.}
+
+			In mathematics, a Tensor is a generalisation of the concepts of Linear Operators into `multilinear operators'. Whilst it is true that they can be represented as multilinear arrays, they are representations of high-dimensional operations, and, crucially, must obey certain transformation laws -- it is these transformation laws which make them `tensors' and not just `a series of numbers'. A multidimensional array $T$ is only a tensor (of type $(p,q)$) if it follows the following transformation law:
+			\begin{equation}
+				T^{i_1,i_2,...,i_p}_{j_1,j_2,...,j_q} \vec{f} = P^{i_1}_{i^\prime_1} P^{i_2}_{i^\prime_2}...P^{i_p}_{i^\prime_p} T^{i^\prime_1,...i^\prime_p}_{j^\prime_1,...,j^\prime_q} \vec{f}^\prime (P^{-1})^{j^\prime_1}_{j_1} ...P^{j^\prime_q}_{j_q}
+			\end{equation}
+			Which is, quite frankly, horrible. These transformation properties allow you to make general statements about the object, without having to specify a given projection or coordinate system -- a very powerful ability which the Machine Learning definition of a tensor completely ignores and obfuscates. The Einstein Field Equations are Tensor Equations, because they hold true on arbitrary Riemannian manifolds:
+			\begin{equation}
+				R_{\mu\nu} - \frac{1}{2} R g_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8 \pi G}{c^4} T_{\mu \nu}
+			\end{equation}
+
+
+
+			\subsubsection{Is this the end of the world?}
+
+			No, of course not. It doesn't really matter, so long as you remember that `tensor' when being used in Machine Learning is being used due to a \textit{structural} similarity to Tensors, rather than due to a \textit{conceptual} similarity.
+
+	\part{Theory of Machine Learning}
+
+		\chapter*{Introduction}
+
+			This part of the notes will (hopefully!) contain the information presented during the workshop, for you to review afterwards at your leisure. 
+
+			At the current time, however, it is empty. You may ignore this section.
+\end{document}

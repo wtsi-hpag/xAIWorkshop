@@ -1,0 +1,42 @@
+\ProvidesPackage{SangerResources}
+%%%%%%% This package defines a bunch of Sanger-specific stuff which is useful across both the Poster and Presentation templats - such as global colours, fonts and some workaround commands to make things play nicely in XeLaTeX.
+
+\newfontfamily{\Wellcome}{WELLCOME-BOLD.TTF}[Path = SangerLibrary/Fonts/]
+\newfontfamily\Helvetica[
+    Path=SangerLibrary/Fonts/,
+    Extension=.otf,
+    UprightFont=*-Lt,
+    BoldFont=*-Bd,
+    ItalicFont=*-It,
+    BoldItalicFont=*-BdIt
+]{HelveticaNeue}
+\setmainfont[
+    Path=SangerLibrary/Fonts/,
+    Extension=.otf,
+    UprightFont=*-Lt,
+    BoldFont=*-Bd,
+    ItalicFont=*-It,
+    BoldItalicFont=*-BdIt
+]{HelveticaNeue}
+
+\selectcolormodel{RGB}
+\definecolor{SangerDeep}{RGB}{46,59,135}
+\definecolor{SangerLight}{RGB}{178,201,212}
+\definecolor{SangerMedium}{RGB}{102,128,186}
+\definecolor{SangerDark}{RGB}{36,38,66}
+
+
+\newcommand\smallcaps[1]
+{
+  {\fontfamily{lmr}\selectfont \textsc{#1}}
+}
+\newcommand\mathtext[1]
+{
+  \text{{\fontfamily{lmr}\selectfont #1}}
+}
+
+\newcommand\SangerLogoColour{\includegraphics[height=1cm]{SangerLibrary/Image/SangerLogo_FullColour.jpg}}
+\newcommand\SangerLogoBlue{\includegraphics[height=2cm]{../SangerResource/Wellcome_Sanger_Institute_Logo_Portrait_Digital_RGB_Monotone_Blue-1.png}}
+\newcommand\SangerLogoWhite{\includegraphics[width=.25\linewidth]{SangerLibrary/Image/whiteLogo.png}}
+\newcommand\SangerLogoBlack{\includegraphics[width=.25\linewidth]{SangerLibrary/Image/blackLogo.png}}
+% \setmainfont{HelveticaNeue}

@@ -1,0 +1,137 @@
+\documentclass[]{SangerLibrary/sanger-present}
+\usepackage{JML}
+\usetikzlibrary{decorations.pathreplacing,calligraphy}
+\graphicspath{{Images/}}
+
+\usepackage{fp}
+\usepackage{pgfplots}
+\usepackage{siunitx}
+% \usepackage[usedvipsnames]{xcolor}
+
+\title{\LARGE First Principles of ML\\ {\footnotesize A Peek Inside the 'Black Box' of Machine Learning}}
+\author{\large Jack Fraser-Govil}
+\institute{The Wellcome Sanger Institute, Hinxton, UK}
+\date{\small 15th October 2024}
+
+
+
+\renewcommand\vec[1]{\boldsymbol{\mathbf{#1}}}
+\begin{document}
+	\maketitlepage
+
+
+	\begin{frame}{Why bother?}
+
+		In a world with dozens of pre-built ML tools....why bother studying the fundamentals?
+
+		\pause In a word...
+		\pause\begin{center}
+			\LARGE FOLKLORE
+		\end{center}
+		% \pause Might get you where you need to go...but often leads you astray
+	\end{frame}
+	\begin{frame}{ML Folklore}
+		\begin{itemize}
+			\pitem ADAM vs AdaGrad?
+			\pitem Softplus vs ReLu vs Leaky ReLu vs Sigmoid?
+			\pitem Cross-Entropy vs Least Squares?
+			\pitem Validation set magic numbers
+			\pitem (Explainability!) 
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Today's Agenda}
+		The aim for today is:
+
+		\begin{itemize}
+			\pitem Classic Perceptron
+			\pitem Feedforward Networks
+			\pitem Non-Linearity
+			\pitem Optimisation \& Backpropagation
+			\pitem Convolutional Networks*
+		\end{itemize}
+		(\small * Time dependent!)
+
+		\pause As we progress you will slowly build up your own ML toolkit, built entirely from scratch! 
+
+	\end{frame}
+
+	% \begin{frame}{}
+	\newcounter{custompart}
+	\setcounter{custompart}{0}
+	\newcommand\partFrame[1]
+	{
+		\stepcounter{custompart}
+		\begin{frame}{}
+			\begin{center}
+				\Wellcome \huge Part \thecustompart
+
+				#1
+			\end{center}
+		\end{frame}
+	}
+	% \end{frame}
+	
+	\begin{frame}{A Warning}
+		
+		\begin{center}
+			{\Large There will be equations.}
+			
+			{\pause \Large You will need to know what they mean!}
+
+			{\pause \it Please, please, please, ask if you want clarification on the underlying mathematics and theory! That's why you're here today!} 
+		\end{center}
+	\end{frame}
+
+
+	\partFrame{The Perceptron}
+	\input{perceptronMacros.tex}
+	\begin{frame}{Basic Decision Making: Defining Cuteness}
+
+		
+		\begin{center}
+			\def\w{8}
+			\begin{tikzpicture}
+
+				\animals
+				\draw[->] (0,0)--node[below]{Size} (10,0);
+				\draw[->] (0,0)--node[left]{Fur} (0,6);
+				\pause \draw[dashed] (0,1)--node[above,rotate=30] {\textbf{Cute}} node[below,rotate=30] {\textbf{Not Cute}} (8,6);
+
+			\end{tikzpicture}
+		\end{center}A
+
+	\end{frame}
+
+	
+	\begin{frame}{Splitting The Plane}
+		In order to split the plane into two parts, we merely need to define a \textit{line}. 
+		
+		\pause \textbf{Question: } If we have $N$ dimensions ($N=2$), how many parameters do we need to define a line?
+
+		\pause \textbf{Answer: } The answer is $N$ - in 2 dimensions, this is friendly $y = mx + c \to (m,c)$
+
+		\pause \textbf{Question: } Why then do we need $N+1$ dimensions?
+	\end{frame}
+
+	\begin{frame}{The Perceptron}
+		We need 3 parameters to define out bi-directional line. The Perceptron classifier algorithm is:
+
+		\begin{equation}
+			P(\vec{x}) = \begin{cases} 1 & \text{if } \tilde{\vec{x}} \cdot \vec{w}\footnote{The dot/inner product is covered in Section 3.1 in the notes} > 0 \\ 0 &\text{else} 
+		\end{cases}
+		\end{equation}
+
+		\pause Where 
+		$$\tilde{\vec{x}} = \begin{pmatrix}
+			1 \\ \vec{x}
+		\end{pmatrix}$$
+		\pause $\vec{w}$ our the \textbf{weights}. 
+	\end{frame}
+
+
+	\begin{frame}{Exercise 1: Perceptron Classifier}
+
+	\end{frame}
+\end{document}
+

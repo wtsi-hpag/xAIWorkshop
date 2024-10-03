@@ -1,0 +1,86 @@
+
+\def\cuteB{-3}
+\def\cuteWA{0}
+\def\cuteWB{1}
+\def\learn{0.01}
+\newcommand\cute[5]
+	{
+		\def\cuteLabel{#5}
+		\def\labelText{Not Cute}
+		\ifnum\cuteLabel=1
+			\def\labelText{Cute}
+		\fi
+		\node at ({#1},{#2}) {\includegraphics[width=2cm,height=2cm,keepaspectratio=true]{#3}};
+		
+		% \node at ({#1},{#2}) {#4 \highlight{}};
+		\def\test{#4}
+		\def\comp{\highlight}
+
+
+
+
+		%%%PERCEPTRON IMPLEMENTED WITHIN IMAGE PLACEMENT
+		\ifnum\test=\comp
+
+			\FPeval{dot}{(\a) + (#1*(\b)) + (#2*(\c))}
+			\def\cuteGuess{0}
+			\pgfmathparse{\dot<0}
+
+			%COMPUTE ASSIGNED VALUE
+			\ifnum\pgfmathresult=0
+				\def\cuteGuess{1}
+			\fi
+			\def\guessText{Not Cute}
+			\if\cuteGuess1
+				\def\guessText{Cute}
+			\fi
+			
+			%DRAW COLOUR
+			\def\highcolour{\wrongcolour}
+			\ifnum\cuteGuess=\cuteLabel
+				\def\highcolour{\rightcolour}
+			\else
+
+				%%%UPDATE WEIGHTS IF GUESSED WRONG
+				\xdef\updated{1}
+				\FPeval{bup}{(\cuteB) + ((\cuteLabel)-(\cuteGuess))*(\learn)}
+				\FPeval{waup}{(\cuteWA) + ((\cuteLabel)-(\cuteGuess))*(\learn)*(#1)}
+				\FPeval{wbup}{(\cuteWB) + ((\cuteLabel)-(\cuteGuess))*(\learn)*(#2)}
+				\xdef\cuteB{\bup}
+				\xdef\cuteWA{\waup}
+				\xdef\cuteWB{\wbup}
+			\fi
+			\fill[\highcolour,opacity=0.2] ({#1},{#2}) circle (1.3);
+			% \node[red] at ({#1},{#2}) {\a +#1* \b + #2 * \c = \dot};
+			
+			\node at ({#1},{#2+1.1}) {\tiny Labelled: \labelText, Guess \guessText};
+		\else
+			% \node at ({#1},{#2-1.1}) {\tiny \labelText};
+		\fi
+		
+	}
+% \setbeamercolor{background canvas}{bg=SangerLight}
+% \logo{\SangerLogoBlack}
+\def\highlight{0}
+\def\rightcolour{green!70!black}
+\def\wrongcolour{red!70!black}
+\def\highcolour{\rightcolour}
+\newcommand\animals{
+	\cute{0.7}{3.5}{mouse}{1}{1}
+	\cute{2}{6}{rabbit}{2}{1}
+	\cute{6}{5.7}{dog}{3}{1}
+	\cute{4}{5.8}{cat}{4}{1}
+	\cute{9}{5.5}{lion}{5}{0}
+	\cute{10}{1}{whale}{6}{0}
+	\cute{7}{2.7}{warthog}{7}{0}
+	\cute{1.7}{1}{molerat}{8}{0}
+	\cute{4}{2}{ayeaye}{9}{0}
+	\cute{0.1}{0.1}{ant}{10}{0}
+}
+
+\newcommand\confusing{
+	\cute{2}{6}{rabbit}{1}{1}
+	\cute{9}{5.5}{lion}{2}{0}
+	\cute{10}{1}{whale}{3}{1}
+	\cute{0.1}{0.1}{ant}{4}{0}
+}

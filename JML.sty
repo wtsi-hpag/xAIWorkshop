@@ -1,0 +1,88 @@
+\ProvidesPackage{JML}[2021]
+%Jack Macro Library!
+\usepackage{amsmath}
+\renewcommand{\d}{\mathrm d}
+\newcommand{\eref}[1]{Eq. \eqref{#1}}
+
+\renewcommand{\d}{\mathrm d}
+\renewcommand{\div}[2]{\frac{\d #1}{\d #2} }
+\newcommand{\pdiv}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pdivbracket}[3]{\left( \pdiv{#1}{#2}\right)_{#3} }
+\newcommand\textset[1]
+{
+	$\{ #1 \} $
+}
+\def\LLR
+{
+	~~\Longleftrightarrow~~
+}
+\def\LR
+{
+	~~~\Longrightarrow~~~
+}
+\newcommand\bvec[1]
+{
+	\mathbf{#1}
+}
+\newcommand\set[1]{\left\{#1\right\}}
+
+
+\newcommand\inner[2]
+{
+	\left\langle #1, #2 \right\rangle
+}
+
+
+\newcommand\fittedImage[1]
+{
+	\begin{center}
+		\includegraphics[keepaspectratio=true, width=0.49\textwidth]{#1}
+	\end{center}
+}
+
+\newcommand\fittedImageLarge[1]
+{
+	\begin{center}
+		\includegraphics[keepaspectratio=true, width=\textwidth]{#1}
+	\end{center}
+}
+\newcommand\normalFigure[3]
+{
+	\begin{figure}
+	    \centering
+		\fittedImage{#1}
+	    \caption{#2}
+	    \label{#3}
+	\end{figure}
+}
+\newcommand\largeFigure[3]
+{
+	\begin{figure*}
+	    \centering
+		\fittedImageLarge{#1}
+	    \caption{#2}
+	    \label{#3}
+	\end{figure*}
+}
+
+\def\commentVisible{1}
+
+% \newcommand\note[1]
+% {
+% 	\if\commentVisible1
+% 		{
+% 			\small
+% 			\color{red}
+% 			#1
+% 		}
+% 	\fi
+% }
+\usepackage{environ}
+\NewEnviron{spalign}
+{
+	\begin{align}
+		\begin{split}
+			\BODY
+		\end{split}
+	\end{align}
+}
