@@ -53,7 +53,7 @@
 
 %% Define the default logo
 \logo{\SangerLogoColour}
-
+\def\SangerLoc{../../Presentations/SangerResource}
 %%% define the custom title page
 \defbeamertemplate*{title page}{customized}[1][]
 {
@@ -61,7 +61,7 @@
     \setbeamertemplate{logo}{}
 		\begin{tikzpicture}
       %%white squares
-			\node[opacity=0, anchor=north east, at=(current page.north east),inner sep=0pt] (a) {{{\vspace{0cm}\includegraphics[height=0.8\paperwidth,angle=-90]{../SangerResource/white_squares.pdf}}}};
+			\node[opacity=0, anchor=north east, at=(current page.north east),inner sep=0pt] (a) {{{\vspace{0cm}\includegraphics[height=0.8\paperwidth,angle=-90]{\SangerLoc/white_squares.pdf}}}};
       
       %%logo
       \node[below right ={-0.04\paperwidth} and {-0.07\paperwidth} of a, anchor = south east] (b) {\SangerLogoBlue};
