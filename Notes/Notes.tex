@@ -628,6 +628,138 @@
 					Weirdly, however, \verb|numpy| does draw a strong distinction between objects of dimension \verb|(n,)| (a vector) and \verb|(n,1)| (a matrix) -- sometimes internal functions will work fine when given either; sometimes you will have to use a \verb|reshape| command to explicitly switch between them. It can be a bit weird!
 
 		
+	
+				\section{Affine Transformations}
+
+					An important thing to note is that the following is \textbf{not} possible:
+					\begin{equation}
+						M \vec{x} = \vec{x} + \vec{m} 
+					\end{equation}
+					You can, naturally, find an $M$ for each $\vec{x}$ which performs this operation, but there is no \textit{general} matrix which always performs this operation: you cannot write $M$ without knowing $\vec{x}$. This exposes the slightly weird fact that \textit{vector addition is not a linear operation}. 
+					
+					This might seem weird: addition is a linear operation, surely? However, if we return to our definition of a linear operator, we find that they must be distributive:
+					\begin{equation}
+						M\left( \vec{x} + a\vec{y}\right) = M \vec{x} + a M\vec{y} 
+					\end{equation}
+					If we tried this with our `addition operator' we would find\footnote{In words: there is a vast difference (in terms of sweets given out) between giving a box of sweets to a classroom, and giving a box of sweets \textit{to each person in the class}}:
+					\begin{spalign}
+						M \vec{x} + a M\vec{y} & = \left(\vec{x} + \vec{m}\right) + a \left( \vec{y} +\vec{m}\right) 
+						\\
+						&= M\left( \vec{x} + a\vec{y}\right) + a\vec{y}
+					\end{spalign}
+					 Given that vector addition represents the \textit{translation} operation, what are we to do? Does this mean we cannot treat addition using our lovely formalism of linear algebra?
+					
+					Technically speaking, yes, that is what it means because -- as we have just shown -- translation and addition are \textbf{non-linear operations}, and so are beyond the scope of \textit{linear} algebra.
+
+					Luckily, this is not the end of the road. 
+
+					An \textbf{Affine Operator} is one which can be written as a combination of a linear operator and a translation operator:
+					\begin{equation}
+						\hat{\mathcal{M}} \vec{x} = \hat{M} \vec{x} + \vec{m}
+					\end{equation}
+
+					That is, Affine Operators are the group of linear operators, with the non-linear translation operators tacked onto the end: Affine Transformations are essentially ``Linear++'' transforms and, although they formally sit outside the realm of Linear Algebra, the majority of the techniques still apply. Of particular interest is the composition of two general affine operators $\hat{\mathcal{M}}, \hat{\mathcal{N}}$:
+
+					\begin{spalign}
+						\hat{\mathcal{M}} \hat{\mathcal{N}} \vec{x} &= \hat{\mathcal{M}} \left( \hat{N} \vec{x} + \vec{n} \right)
+						\\
+						& = \hat{M} \hat{N} \vec{x} + \left(\hat{M} \vec{n} + \vec{m}\right)
+						\\
+						& = \hat{P} \vec{x} + \vec{p} 
+						\\
+						& = \hat{\mathcal{P}} \vec{x}
+					\end{spalign}
+					Which, in words, shows that \textbf{any combination of affine operators can always be written as a single affine operator}; that is, affine operators form a closed group.
+
+					This is important because the perceptron algorithm (and thus, the internal workings of nodes in a feedforward network) are perform an affine transformation on their input vector -- this has important ramifications which we will discuss in the workshop.
+
+					\subsection{Addition vs. Augmenting}
+
+						There are\footnote{at least!} two different ways that one may represent an Affine Operator -- one of them as already been demonstrated:
+						\begin{equation}
+							\hat{\mathcal{M}} \vec{x} = \hat{M} \vec{x} + \vec{m} 
+						\end{equation}
+
+						This makes it eminently clear that our operation is a composition of a linear operator, and an addition operation. 
+
+						However, in some circumstances (....such as when you're trying to elegantly write an optimisation routine for a backpropagating neural network, to give you a spoiler alert) this can be a little bit awkward to deal with, because you have two different `types' of object to deal with. 
+
+						In such cases it can be easier to treat the Affine Operator as a linear operator \textit{on an augmented space}. 
+
+						Consider the following constructions (where we have projected into using matrices in place of operators):
+						\begin{equation}
+							\tilde{\vec{x}} = \begin{bmatrix}
+								1 \\ \vec{x} 
+							\end{bmatrix} ~~~ \tilde{M} = \begin{bmatrix}
+								\vec{m} & M \end{bmatrix} = \begin{bmatrix}
+									\begin{pmatrix}
+										m_1 \\ m_2 \\ m_3 \\ \vdots
+									\end{pmatrix} & M
+								\end{bmatrix}
+						\end{equation}
+						That is, $\tilde{\vec{x}}$ is just $\vec{x}$ with a `1` inserted above the first element, and $\tilde{M}$ is just $M$ with the vector $\vec{m}$ inserted as the first column. 
+
+						$\tilde{\vec{x}}$ is therefore one dimension larger than $\vec{x}$, and $\tilde{M}$ similarly has 1 more column than $M$ (but the same number of rows).
+
+						When we multiply these out:
+						\begin{spalign}
+							\tilde{M} \tilde{\vec{x}} & = \begin{pmatrix}
+								m_1 + \sum_{i} M_{1i} x_i
+								\\
+								m_2 + \sum_i M_{2i} x_i
+								\\
+								m_3 + \sum_i M_{3i} x_i
+								\\
+								\vdots 
+							\end{pmatrix}
+							\\
+							& = \vec{m} + M\vec{x}
+						\end{spalign}
+
+						This has the advantage that we do not need to do anything to treat the addition differently from the multiplication: the rules of matrix multiplication handle that for us automatically. 
+
+						If (as we will be later), we are interested only in finding a suitable transform $\hat{\mathcal{M}}$ which simply works `well enough' and has no intrinsic meaning supplied to it, then it is sufficient to treat it solely as an unknown matrix multiplication on an augmented input vector: we don't have to worry about the internal structure of $\tilde{M}$ -- merely trust that the neural network will sort it out for us.
+
+					\subsubsection{An Example}
+
+						Consider the following components of an affine transformation which rotates an $(x,y)$ vector by $90^\circ$ around the x axis, and then translates it upwards by 2 units:
+						\begin{equation}
+							R = \begin{pmatrix}
+								0 & 1 \\ -1 & 0
+							\end{pmatrix} ~~~~~\vec{r} = \begin{pmatrix}
+								0 \\ 2
+							\end{pmatrix}
+						\end{equation}
+						Applying this to the vector $\vec{x} = (2,4)$ we see:
+						\begin{spalign}
+							R \vec{x} + \vec{r} & =\begin{pmatrix}
+								0 & 1 \\ -1 & 0
+							\end{pmatrix} \begin{pmatrix} 2 \\ 4 \end{pmatrix} + \begin{pmatrix} 0 \\ 2 \end{pmatrix}
+							\\
+							& = \begin{pmatrix}
+								4 \\ -2
+							\end{pmatrix} + \begin{pmatrix} 0 \\ 2 \end{pmatrix}
+							\\
+							& =  \begin{pmatrix}
+								4 \\ 0
+							\end{pmatrix}
+						\end{spalign}
+
+						If instead we augmented the matrix to become:
+						\begin{equation}
+							\tilde{R} = \begin{pmatrix}
+								0 & 0 & 1 \\ 2 & -1 & 0
+							\end{pmatrix}~~~~ \tilde{\vec{x}} = \begin{pmatrix}
+								1 \\ 2 \\ 4
+							\end{pmatrix}
+						\end{equation}
+						This gives the result:
+						\begin{equation}
+							\tilde{R} \tilde{\vec{x}} = \begin{pmatrix}
+								4 \\ 0 
+							\end{pmatrix}
+						\end{equation}
+						As expected, this is the same final result, but rather than two separate operations, we did one (larger) operation.
 		\chapter{Multivariable \& Vector Calculus}
 
 			The above section made the assumption that $f$ was only ever a function of one variable, a single scalar. That is clearly a limitation; we are going to want to do calculus with many dozens, if not thousands of parameters!
@@ -1188,4 +1320,183 @@
 			This part of the notes will (hopefully!) contain the information presented during the workshop, for you to review afterwards at your leisure. 
 
 			At the current time, however, it is empty. You may ignore this section.
+
+
+		% \chapter{Training an MLP}
+
+		% 	Training an MLP is a fiddly business: the mathematics is actually rather simple (it is merely a recurrence relation on the chain rule) -- the difficulty is merely one of ensuring all the right parts end up in the right places. 
+
+		% 	For that reason, it is important to make sure we are clear about our notation. 
+
+		% 	The Cost function associated with the network is something which is \textbf{maximised} at when the network is performing well, and minimised when it is performing badly. 
+
+		% 	A decent first guess at the cost function would be the least squares function, evaluated across the entire corpus of data:
+		% 	\begin{equation}
+		% 		\mathcal{L}(\{\vec{x}\}, \{\vec{w}\}) = \sum_\text{data, $i$} \left( \mathcal{P}(\vec{x}_i) - L_i\right)^2
+		% 	\end{equation}
+		% 	Here $\mathcal{P}$ is the output of our network (the final output vector), and $L_i$ is the label of that data. If our network had a multidimensional output (so $\mathcal{P}$ and $L$ were vectors), we would upgrade this equation to being the dot product. 
+
+		% 	Our goal is to find the set of $\{\vec{w}\}$ which minimise this. Our goal, therefore, is simply to find the set:
+		% 	\begin{equation}
+		% 		\left\{ \pdiv{\mathcal{L}}{\vec{w}_j}  \right\}
+		% 	\end{equation}
+		% 	The problem, naturally, is that if we have $N$ nodes, then this is $N$ (vector) partial differential equations. Gross. 
+
+		% 	This is clearly going to be very fiddly, and so we make some simplifying assumptions about our notation:
+		% 	\begin{equation}
+		% 		{y}_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} ~~~~~ \vec{y}_i = \begin{pmatrix}
+		% 			y_i^1 \\ y_i^2 \\ y_i^3 \\ y_i^4 \\ \vdots 
+		% 		\end{pmatrix}
+		% 	\end{equation}
+		% 	That is, ${y}_i^j$ is the \textit{unactivated result} which comes out of node $j$ in layer $i$, and which can be packaged into the vector $\vec{y}_i$; the \textit{unactivated vector} associated with layer $i$.
+
+		% 	Each layer\footnote{It is common to say that the \textit{nodes} perform the activation. However, this is only really true in the case of separable functions. Things like softmax are better thought of as being done by the layer, as it requires knowledge of all the nodes in the layer!} then performs an activation transformation:
+		% 	\begin{equation}
+		% 		\vec{x}_i = \mathcal{A}_i(\vec{y}_i) ~~~~~~~ \tilde{\vec{x}}_i = \begin{bmatrix} 1 \\\mathcal{A}_i(\vec{y}_i)\end{bmatrix}
+		% 	\end{equation}
+		% 	If this is a separable transform, then it can be written as:
+		% 	\begin{equation}
+		% 		\tilde{\vec{x}_i} = \begin{pmatrix}
+		% 			1 \\ a_i\left( y_i^1\right) \\ a_i\left( y_i^2\right) \\ a_i\left( y_i^3\right)\\ a_i\left( y_i^4\right) \\ \vdots 
+		% 		\end{pmatrix}
+		% 	\end{equation}
+		% 	That is, it's a function which is repeated on each element of the vector. Non-separable functions exist and are in common usage: the softmax function, for instance is equal to:
+		% 	\begin{equation}
+		% 		\mathcal{A}_\text{softmax}(\vec{y}_i) = \frac{1}{\sum_j \exp(y_i^j)}\begin{pmatrix}
+		% 			\exp(y_i^1) \\ \exp(y_i^2) \\ \vdots 
+		% 		\end{pmatrix}
+		% 	\end{equation}
+		% 	Since $y_i^2$ requires knowledge of the value of $y_i^1$, this cannot be written as a separable activation function. We shall focus on separable activation functions for now.
+
+		% 	The problem is that our cost function is a horrible series of these functions. Taking the derivative is going to be wildly unpleasant. 
+		% % 	\begin{float}
+		% % 	For a simple 3-layer network, the problem looks like this:
+		% % 	\newcommand\afunc[2]
+		% % 	{
+		% % 		\mathcal{A}_{#1}\left(\begin{matrix}\vec{w}^1_{#1} \cdot#2 \\ \vec{w}^2_{#1} \cdot#2 \\  \vec{w}^3_{#1} \cdot#2  \\ \vdots \end{matrix} \right)
+		% % 	}
+		% % 	\begin{equation}
+		% % 		\mathcal{P}(\vec{d}_\text{input}) =  \afunc{3}{\afunc{2}{{\afunc{1}{\vec{d}_\text{input}}}}}
+		% % 	\end{equation}
+		% % \end{float}
+
+		% 	Luckily, there is an easier way. 
+
+		% 	We start by simplifying our gradient: rather than trying to compute the gradient of the whole dataset at once, we want to compute the gradient one datapoint at a time:
+		% 	\begin{equation}
+		% 		\mathcal{L} = \sum_i \mathcal{L}_i(\vec{d}_i)
+		% 	\end{equation}
+		% 	The single most important equation we will be using is this chain rule equation, which notes that:
+		% 	\begin{spalign}
+		% 		\pdiv{\mathcal{L}_i}{\vec{w}_i^j} & = \pdiv{\mathcal{L}}{y_i^j} \pdiv{y_i^j}{\vec{w}} 
+		% 		\\
+		% 		& \left( \text{recall } y_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} \right)
+		% 		\\
+		% 		& = \pdiv{\mathcal{L}}{y_i^j} \tilde{\vec{x}}_{i-1}
+		% 	\end{spalign}
+		% 	\textbf{This is why I suggested the route of augmenting vectors rather than adding the bias manually -- it makes your gradients trivially easy to compute as a whole, rather than having to do the bias separately!}
+
+		% 	This is easy to compute for the final layer, since $\mathcal{P} = \mathcal{A}(\vec{y_{N}})$, so we merely need to compute (we have assumed that the output $\vec{x}_N$ is a $q-$dimensional vector, with elements $x_N^i = a(y_N^i)$. If the output is a scalar, then $q = 1$ and you can ignore the $i$ labels)
+		% 	\begin{equation}
+		% 		\pdiv{\mathcal{L}_i}{y_N^i} = 2 \left(a(y_N^i) - L_N^i \right) \times \pdiv{}{y_N^i} a(y_N^i)
+		% 	\end{equation}
+		% 	We assume that (since we chose it) if $a_N(x)$ is the activation function of the $N^\text{th}$ layer, then we know that $d_N(x) = \pdiv{a_N}{x}$ is its derivative. We can then write:
+		% 	\begin{equation}
+		% 		\pdiv{\mathcal{L}_i}{y_N^i} = 2 \left(a(y_N^i) - L_N^i \right) \times d_N(y_N^i)
+		% 	\end{equation}
+		% 	And therefore:
+		% 	\begin{equation}
+		% 		\pdiv{\mathcal{L}_i}{\vec{w}_N} =  2 \left({x}^i_N- L_N^i \right) \times d_N(y_N^i) \tilde{\vec{x}}_{N-1}
+		% 	\end{equation}
+		% 	This is easy to compute \& calculate. One layer down, an unknown number to go....
+
+		% 	The next layer, down, however, can be trivially computed from the chain rule. Since the output from layer $p$, $\vec{y}_p$ is only directly used by the layer $p+1$, we can write:
+
+		% 	\begin{equation}
+		% 		y^i_{p+1} = f(\vec{y}_{p})
+		% 	\end{equation}
+		% 	Naturally, this is also a function of $p-1$, but only because $\vec{y}_p = f(\vec{y}_{p-1})$. Therefore, if we already know $\pdiv{\mathcal{L}}{y^i_{p+1}}$, then:
+		% 	\begin{equation}
+		% 		\pdiv{\mathcal{L}_q}{y_p^i} = \sum_{\text{nodes $j$ in $p+1$ layer}} \pdiv{y_{p+1}^j}{y_p^i} \pdiv{\mathcal{L}_q}{y_{p+1}^j}
+		% 	\end{equation}
+		% 	That is, the derivative with respect to the $y$ in layer $p$ is equal to (the sum of) the way in which $y_{p+1}$ affects $\mathcal{L}$, multiplied by the way in which $y_p$ affects $y_{p+1}$. 
+
+		% 	This seems relatively horrible to write out in mathematics, but we're almost there. 
+
+		% 	The final step is to write $\pdiv{y_{p+1}}{y_p}$ in terms of known variables. We recall that:
+		% 	\begin{equation}
+		% 		y^j_{p+1} = \vec{w}_{p+1}^j \cdot \begin{bmatrix} 1 \\ a_{p+1}(y_p^1) \\ a_{p+1}(y_p^2) \\ \vdots \end{bmatrix}
+		% 	\end{equation}
+		% 	Therefore:
+		% 	\begin{spalign}
+		% 		\pdiv{y^j_{p+1}}{y_p^i} &= \left[ \vec{w}_{p+1}^j \right]_{i+1} \div{}{y_{p}^j} a_{p+1}(y_p^i)
+		% 		\\
+		% 		& = \left[ \vec{w}_{p+1}^j \right]_{i+1} d_{p+1}(y_p^i)
+		% 	\end{spalign}
+		% 	\textbf{Note that the index of $[\vec{w}]$ is offset by one: $i+1$ not $i$. This is because of the bias term which sits at the first index of $\vec{w}$.}
+
+		% 	\newpage 
+			
+		% 	\subsubsection{Putting it All Together}
+
+		% 		This is a lot of maths. The upside is that it is relatively trivial to actually \textit{implement} within the neural network. 
+
+		% 		In order to compute the gradients, we have:
+		% 		\begin{equation}
+		% 			\pdiv{\mathcal{L}_q}{y_\ell^i} = \begin{cases} \pdiv{\mathcal{L}_q}{P_q^i} \times d_N(y_N^i) & \text{ if $\ell = N-1$}
+		% 			\\
+		% 			d_\ell(y_\ell^i) \sum_{j}  \left[ \vec{w}_{\ell+1}^j \right]_{i+1} \pdiv{\mathcal{L}}{y_{\ell+1}^j}
+					
+		% 			\end{cases}
+		% 		\end{equation}
+		% 		Where $\pdiv{\mathcal{L}_q}{P_q^i}$ is the derivative of your chosen cost function, and $d_N(y)$ is the derivative of the $N^\text{th}$ layer's activation function. Having computed all of these values, it is therefore trivial to find:
+		% 		\begin{equation}
+		% 			\pdiv{\mathcal{L}_q}{\vec{w}_\ell^i} = \pdiv{\mathcal{L}_q}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
+		% 		\end{equation}
+
+		% 		This seems imposing, so it is worth reiterating what is happening.
+		% 		\begin{itemize}
+		% 			\item We first start by passing the information \textit{forward} through the network, in order to compute our values of $\vec{y}$, and $\tilde{\vec{x}}$ since we need these to compute the gradients.
+		% 			\item We then move to the back of the network by first computing how the score changes if the prediction changes. This is $\pdiv{C_q}{P_q^i}$: it tells us how the score $(C)$ of the $q^\text{th}$ datapoint changes when we tweak the value of $P$, the prediction. 
+		% 			\item The final layer of the network (the one which makes $P$) then uses this information to work out how $P$ changes when it tweaks its unactivated values, $\vec{y}$. It then uses this to work out how the score $\mathcal{L}$ changes when $y$ is tweaked: this is $\pdiv{\mathcal{L}}{y_N}$. 
+		% 			\item Th next layer down then works out how much $\vec{y}_N$ changes when the layer $N-1$ tweaks \textit{it's} unactivated values. The rate at which $\mathcal{L}$ changes in response is just the product of the higher layer's gradients times these internal tweak values, giving us $\pdiv{\mathcal{L}}{y_{N-1}}$
+		% 			\item Then we repeat through the network, each time using the upper layer's gradient to compute the gradient of the next layer. 
+		% 			\item When we reach the first layer, we are almost done.
+		% 			\item We then go back through the network and use $\pdiv{\mathcal{L}}{y}$ to compute $\pdiv{\mathcal{L}}{\vec{w}}$ -- this is a simple multiplication!
+		% 		\end{itemize}
+			% We start by noting that, for some vector $\vec{z}$:
+			% \begin{equation}
+			% 	\pdiv{\mathcal{L}}{\vec{z}} = \sum_\text{data $i$} 2 \left( \mathcal{P}(\vec{d}_i) - L_i\right) \pdiv{\mathcal{P_i}}{\vec{z}}
+			% \end{equation}
+			
+			% This is easy to compute for the final layer in the network, because (assuming that $P$ is a $q$-dimensional vector)
+			% \begin{spalign}
+			% 	\mathcal{P} & = \mathcal{A}_N({\vec{y}_N})
+			% 	\\
+			% 	& =\afunc{N}{\tilde{\vec{x}}_{N-1}}
+			% \end{spalign}
+			% We can therefore write:
+			% \begin{spalign}
+			% 	\pdiv{\mathcal{P}}{\vec{w}_N^j} =  \pdiv{\mathcal{P}^j}{y^j_N} \pdiv{{y}_N^j}{\vec{w}^j_N} 
+			% \end{spalign}
+			% This is our basic vector chain rule.
+			
+			% 
+			% \begin{spalign}
+			% 	\pdiv{\mathcal{P}}{\vec{w}_N^j} =  d_N(y_N^j) \times \tilde{\vec{x}}_{N-1}
+			% \end{spalign}
+			% And therefore:
+			% \begin{equation}
+			% 	\pdiv{\mathcal{L}}{\vec{w}_N^j} = \sum_\text{data $i$} 2 \left( \mathcal{P}(\vec{d}_i) - L_i\right)d_N(y_N^j) \times \tilde{\vec{x}}_{N-1}
+			% \end{equation}
+			% \textbf{This is why I suggested the route of augmenting vectors rather than adding the bias manually -- it makes your gradients trivially easy to compute as a whole, rather than having to do the bias separately!}
+
+			% OK. So the final layer is doable. What about the next layer down?
+
+			% In this case, we find that:
+
+			% \begin{equation}
+				
+			% \end{equation}
+			
 \end{document}

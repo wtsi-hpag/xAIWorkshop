@@ -127,12 +127,479 @@
 		$$\tilde{\vec{x}} = \begin{pmatrix}
 			1 \\ \vec{x}
 		\end{pmatrix}$$
-		\pause $\vec{w}$ our the \textbf{weights}. 
+		\pause $\vec{w}$ are the \textbf{weights}. 
 	\end{frame}
 
 
 	\begin{frame}{Exercise 1: Perceptron Classifier}
+		\begin{center}
+			Using the provided class structure \& weights, write a perceptron classifier for the cuteness data.
+
+			The provided weights classify only one animal correctly. Which is it?
+		\end{center}
+	\end{frame}
+
+
+	\begin{frame}{Training A Perceptron}
+		Training a perceptron is easy. Loop over the data, make a prediction ($P$), compare it to the truth  ($T$) and if it is wrong:
+
+		\pause \begin{equation}
+			\vec{w} \to \vec{w} + r \times \left(T - P\right) \tilde{\vec{x}}
+		\end{equation}
+
+		\pause This works because it always makes $\vec{w} \cdot \tilde{\vec{x}}$ move closer towards zero (and hence to the tipping point of altering its decision).
+
+	\end{frame}
+
+	\begin{frame}{Exercise 2: Train Your Perceptron}
+		\begin{center}
+			Write the Train() method of your Perceptron. Run it on the cuteness data. 
+
+			\pause How long does it take to train to 100\% accuracy?
+		\end{center}
+	\end{frame}
+
+	\begin{frame}{Exercise 3: The Limits of Linearity}
+		Add in more data -- what goes wrong?
+
+		\only<2>{\centering \includegraphics[width=0.8\linewidth,height=0.7\paperheight,keepaspectratio=true]{accuracy_bigStep.png}}
+
+		\only<3>{\centering \includegraphics[width=0.8\linewidth,height=0.7\paperheight,keepaspectratio=true]{accuracy_smallStep.png}}
+	\end{frame}
+
+	\begin{frame}{The Nonlinear Perceptron}
+		Eminently possible to have a non-linear perceptron. 
 		
+		\pause Pass $\vec{x}$ through a non-linear transform to make it:
+
+		\begin{equation}
+			\vec{x}^\prime = \begin{pmatrix}
+				1 \\ x \\ y \\ x^2 \\ \sin(x) \\ x^2 \exp(y) \\ \cos(\sin(\exp(\sin(\log(x^2 + 9 xy))))) \\ \vdots \end{pmatrix}
+		\end{equation}
+
+	\end{frame}
+
+	\begin{frame}{The Nonlinear Perceptron}
+		Here is the results of a perceptron where:
+
+		\setcounter{MaxMatrixCols}{20}
+		\begin{equation}
+			\vec{x}^\prime(x,y) = \begin{pmatrix}
+				1 & x & y & x^2 & xy & y^2 & x^3 & x^2y & xy^2 & y^3 & x^4 & x^3y & x^2y^2 & xy^3 & y^4
+			\end{pmatrix}^\intercal
+		\end{equation}
+
+
+		\textit{Bonus Question: Why did I choose this?}
+
+	\end{frame}
+
+	\begin{frame}{The Nonlinear Perceptron}
+		
+
+		{\centering \includegraphics[width=0.8\linewidth,height=0.8\paperheight,keepaspectratio=true]{NonLinear.png}}
+
+	\end{frame}
+
+	\begin{frame}{The Limits of NonLinearity}
+		
+
+		\begin{minipage}{0.5\linewidth}
+			\textbf{Target}
+
+			{\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_full.png}}
+		\end{minipage}\begin{minipage}{0.5\linewidth}
+
+			\only<2>{\textbf{Reality (1st Order - 3 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_1.png}}
+
+			\only<3>{\textbf{Reality (2nd Order - 6 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_2.png}}
+
+			\only<4>{\textbf{Reality (3rd Order - 10 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_3.png}}
+
+			\only<5>{\textbf{Reality (4th Order - 15 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_4.png}}
+
+			\only<6>{\textbf{Reality (5th Order - 21 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_5.png}}
+
+			\only<7>{\textbf{Reality (5th Order - 21 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_10.png}}
+
+			\only<8>{\textbf{Reality (20th Order - 231 parameters)}
+				
+			\centering \includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{xor_20.png}}
+		\end{minipage}
+		
+
+	\end{frame}
+	
+
+	\begin{frame}{What do to?}
+		\begin{center}
+			\pause MORE!
+		\end{center}
+	\end{frame}
+
+	\newcommand\cec[1]{{\vec{#1}}}
+	{
+	\nologo
+	\begin{frame}{The Multilayered Perceptron}
+		% Let's try chaining lots of pecreptrons together.....
+		
+		\begin{tikzpicture}
+			% \draw (0,0) circle (0.4);
+			\pause\node[draw,circle] at (0.3,0) {\footnotesize Input};
+			\draw[->] (0.9,0)--(1.2,0);
+			\def\baseheight{-3.5}
+			\draw [decorate, decoration = {calligraphic brace}] (1.4,\baseheight) --node[below]{Input layer}  (-1,\baseheight);
+			\node[anchor=west] at (1.1,0) {$\tilde{\vec{x}}_0$};
+
+			\pause
+			
+			
+			% \draw [decorate, decoration = {calligraphic brace}] (1.3,1.2) --  (1.3,-1.2);
+			
+			\foreach \i[count=\j from 0] in {3,2,...,-3}
+			{
+				\def\r{0.46}
+				\def\y{\i}
+				\def\x{3}
+				\draw[->] (1.8,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{1,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont$x_{1\j}$};%\phi_{1}^{\j}(y_{1}^{\j})$};
+			}
+			\pause\draw [decorate, decoration = {calligraphic brace}] (4.5,3) --  (4.5,-3);
+			\node[anchor=west] at (4.6,0) {$\tilde{\vec{x}}_1$};
+			\pause\draw [decorate, decoration = {calligraphic brace}] (5.9,\baseheight) --node[below]{Hidden layer 1}  (1.5,\baseheight);
+			
+			\pause
+
+			\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+			{
+				\def\r{0.46}
+				\def\y{\i+\r}
+				\def\x{6.5}
+				\draw[->] (5.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{2,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont$x_{2\j}$};%\phi_{2}^{\j}(y_{2}^{\j})$};
+			}
+			\draw [decorate, decoration = {calligraphic brace}] (8.2,2.6) --  (8.2,-2.6);
+			\draw [decorate, decoration = {calligraphic brace}] (9.7,\baseheight) --node[below]{Hidden layer 2}  (6,\baseheight);
+			\node[anchor=west] (A) at (8.35,0) {\small$\tilde{\vec{x}}_2$};
+			\pause\node[anchor=west] at (A.east) {\small$\hdots\tilde{\vec{x}}_{n-1}$};
+			\pause\foreach \i[count=\j from 0] in {0}
+			{
+				\def\r{0.46}
+				\def\y{\i}
+				\def\x{11.5}
+				\draw[->] (10.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{n,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont${x}_\text{output}$};
+			}
+			
+			\draw [decorate, decoration = {calligraphic brace}] (13,\baseheight) --node[below]{Output layer}  (10.5,\baseheight);
+			% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+			% \node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+		\end{tikzpicture}
+	\end{frame}
+	}
+
+	\begin{frame}{Exercise 4: The Multilayered Perceptron}
+	
+		\begin{center}
+			\bf I have provided the skeleton of a Node, Layer and Network class. 
+			\\
+			~
+			\\
+			\pause Fill them in so that you can construct and operate a network. 
+			\\
+			~
+			\\
+			\pause Do you notice anything odd about how this predictor behaves?
+			\\
+			~
+			\\
+			~
+			\\
+			\pause (For now: randomly initialise your weights)
+		\end{center}
+	\end{frame}
+
+	\begin{frame}{All that for nothing?}
+	
+		If everything went well, you should see something like this:
+
+		\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{LinearMLP.png}
+	\end{frame}
+
+	{
+	\nologo
+	\begin{frame}{Affine Mess We Find Ourselves in}
+		% Let's try chaining lots of pecreptrons together.....
+		
+		\begin{tikzpicture}
+			% \draw (0,0) circle (0.4);
+			\node[draw,circle] at (0.3,0) {\footnotesize Input};
+			\draw[->] (0.9,0)--(1.2,0);
+			\def\baseheight{-3.5}
+			\draw [decorate, decoration = {calligraphic brace}] (1.4,\baseheight) --node[below]{Input layer}  (-1,\baseheight);
+			\node[anchor=west] at (1.1,0) {$\tilde{\vec{x}}_0$};
+			
+			
+			\foreach \i[count=\j from 0] in {3,2,...,-3}
+			{
+				\def\r{0.46}
+				\def\y{\i}
+				\def\x{3}
+				\draw[->] (1.8,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{1,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont$x_{1\j}$};%\phi_{1}^{\j}(y_{1}^{\j})$};
+			}
+			\draw [decorate, decoration = {calligraphic brace}] (4.5,3) --  (4.5,-3);
+			\node[anchor=west] at (4.6,0) {$\tilde{\vec{x}}_1$};
+			\draw [decorate, decoration = {calligraphic brace}] (5.9,\baseheight) --node[below]{Hidden layer 1}  (1.5,\baseheight);
+			
+			\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+			{
+				\def\r{0.46}
+				\def\y{\i+\r}
+				\def\x{6.5}
+				\draw[->] (5.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{2,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont$x_{2\j}$};%\phi_{2}^{\j}(y_{2}^{\j})$};
+			}
+			\draw [decorate, decoration = {calligraphic brace}] (8.2,2.6) --  (8.2,-2.6);
+			\draw [decorate, decoration = {calligraphic brace}] (9.7,\baseheight) --node[below]{Hidden layer 2}  (6,\baseheight);
+			\node[anchor=west] (A) at (8.35,0) {\small$\tilde{\vec{x}}_2$};
+			\node[anchor=west] at (A.east) {\small$\hdots\tilde{\vec{x}}_{n-1}$};
+			\foreach \i[count=\j from 0] in {0}
+			{
+				\def\r{0.46}
+				\def\y{\i}
+				\def\x{11.5}
+				\draw[->] (10.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{n,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont${x}_\text{output}$};
+			}
+			
+			\draw [decorate, decoration = {calligraphic brace}] (13,\baseheight) --node[below]{Output layer}  (10.5,\baseheight);
+			% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+			% \node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+		\end{tikzpicture}
+	\end{frame}
+
+	\begin{frame}{Affine Mess We Find Ourselves in}
+		% Let's try chaining lots of pecreptrons together.....
+		
+		\begin{tikzpicture}
+			% \draw (0,0) circle (0.4);
+			\node[draw,circle] at (0.3,0) {\footnotesize Input};
+			\draw[->] (0.9,0)--(1.2,0);
+			\def\baseheight{-3.5}
+			\draw [decorate, decoration = {calligraphic brace}] (1.4,\baseheight) --node[below]{Input layer}  (-1,\baseheight);
+			\node[anchor=west] at (1.1,0) {${\vec{x}}$};
+
+			\draw[ultra thick,->] (1.5,0)--node[below]{\footnotesize Augment}++(1,0);
+			
+			\node[anchor=west] at (2.6,0) {${\tilde{\vec{x}}}$};
+			\draw[ultra thick,->] (3,0)--node[below]{\footnotesize Matrix}++(1,0);
+	
+			\node[anchor=west] at (4,0) {$ W \tilde{\vec{x}}$};
+			\draw [decorate, decoration = {calligraphic brace}] (5.9,\baseheight) --node[below]{Hidden layer 1}  (1.5,\baseheight);
+			
+			\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+			{
+				\def\r{0.46}
+				\def\y{\i+\r}
+				\def\x{6.5}
+				\draw[->] (5.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{2,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont$x_{2\j}$};%\phi_{2}^{\j}(y_{2}^{\j})$};
+			}
+			\draw [decorate, decoration = {calligraphic brace}] (8.2,2.6) --  (8.2,-2.6);
+			\draw [decorate, decoration = {calligraphic brace}] (9.7,\baseheight) --node[below]{Hidden layer 2}  (6,\baseheight);
+			\node[anchor=west] (A) at (8.35,0) {\small$\tilde{\vec{x}}_2$};
+			\node[anchor=west] at (A.east) {\small$\hdots\tilde{\vec{x}}_{n-1}$};
+			\foreach \i[count=\j from 0] in {0}
+			{
+				\def\r{0.46}
+				\def\y{\i}
+				\def\x{11.5}
+				\draw[->] (10.3,0)--({\x-\r-0.1},\y);
+				\draw (\x,{\y}) circle ({\r});
+				\node at (\x,{\y}) { $\cec{w}_{n,\j}$};
+				\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+				\def\xx{\x+\r+0.3}
+				% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+				\node[anchor=west] at (\xx,{\y}) {\fontsize{8}{0}\selectfont${x}_\text{output}$};
+			}
+			
+			\draw [decorate, decoration = {calligraphic brace}] (13,\baseheight) --node[below]{Output layer}  (10.5,\baseheight);
+			% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+			% \node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+		\end{tikzpicture}
+	\end{frame}
+
+	\begin{frame}{Affine Mess We Find Ourselves in}
+		% Let's try chaining lots of pecreptrons together.....
+		
+		\begin{tikzpicture}
+			% \draw (0,0) circle (0.4);
+			\node[draw,circle] at (0.3,0) {\footnotesize Input};
+			\draw[->] (0.9,0)--(1.2,0);
+			\def\baseheight{-3.5}
+			\node[anchor=west] at (1.1,0) {${\vec{x}}$};
+
+			\draw[ultra thick,->] (1.5,0)--node[below]{\footnotesize Augment}++(1,0);
+			
+			\node[anchor=west] at (2.51,0) {${[{\vec{x}}]}$};
+			\draw[ultra thick,->] (3.1,0)--node[below]{\footnotesize Matrix}++(1,0);
+	
+			\node[anchor=west] at (4.1,0) {$ W_1 [\vec{x}]$};
+
+			\draw[ultra thick,->] (5.3,0)--node[below]{\footnotesize Augment}++(1,0);
+			
+			\node[anchor=west] at (6.2,0) {$\left[{{W_1\bar{\vec{x}}}}\right]$};
+			\draw[ultra thick,->] (7.4,0)--node[below]{\footnotesize Matrix}++(1,0);
+			\node[anchor=west] at (8.5,0) {$W_2\left[{{W_1\bar{\vec{x}}}}\right]$};
+			
+			\draw[ultra thick,->] (10.5,0)--node[below]{\footnotesize Augment....}++(1,0);
+
+		
+			% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+			% \node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+		\end{tikzpicture}
+	\end{frame}
+
+	}
+
+	\begin{frame}{Affine Mess We Find Ourselves in}
+		Or, in terms of \textbf{Affine Operators} (Chapter 3.4 in the notes):
+
+		\begin{spalign}
+			\vec{x}_1 & = \hat{\mathcal{W}_1} \vec{x}_\text{input}
+			\\
+			\vec{x}_2 & = \hat{\mathcal{W}_2} \vec{x}_1 = \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
+			\\
+			\vec{x}_3 & = \hat{\mathcal{W}_3} \vec{x}_2 =  \hat{\mathcal{W}}_3 \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
+			\\
+			\vdots
+			\\
+			x_\text{output} & = \begin{cases} 1 & \hat{\mathcal{W}_N} \vec{x}_{N-1} > 0 \\ 0 &\text{else} \end{cases}
+		\end{spalign}
+	\end{frame}
+
+	\begin{frame}{Affine Mess We Find Ourselves in}
+		But...affine operators obey:
+		\begin{equation}
+			\hat{\mathcal{W}_2} \hat{\mathcal{W}_1} = \hat{\mathcal{V}}
+		\end{equation}
+		(Affine + Affine = Affine)
+
+		Which means:
+
+		\begin{equation}
+			\hat{\mathcal{W}}_N \hat{\mathcal{W}}_{N-1} \hat{\mathcal{W}}_{N-2} \hdots \hat{\mathcal{W}}_{1}  \vec{x}_\text{input}  = \hat{\mathcal{V}} \vec{x}_\text{input} 
+		\end{equation}
+
+		\pause If you do the maths:
+
+		\begin{equation}
+			\hat{\mathcal{V}} \vec{x}= \vec{v} \cdot \vec{x} + \vec{b} 
+		\end{equation}
+
+		\pause Which is just....a single perceptron layer
+	\end{frame}
+
+	\begin{frame}{Affine Mess We Find Ourselves in}
+
+		\begin{center}
+			\bf If all you do is multiply by matrices \& add vectors, you will \textit{never} be doing anything other than an (extremely wasteful) perceptron algorithm
+		\end{center}
+		
+	\end{frame}
+
+	\begin{frame}{NonLinearity to the Rescue!}
+		Need to break this affine relationship: enter \textbf{activation functions}.
+
+		Let:
+		\begin{equation}
+			\vec{x}_n = \text{activate}\left(W \vec{x}_{n-1} + \vec{b} \right)
+		\end{equation}
+		Where $\text{activate}\left(x\right)$ is a non-linear function, the activation function.
+
+		One of the simples ways to break linearity is to add a \textit{elementwise function}:
+
+		\begin{spalign}
+			\vec{v} & = W \vec{x}_{n-1} + \vec{b}
+			\\
+			[\vec{x}_n]_i & = \sigma(v_i)
+		\end{spalign}
+		
+		Elementwise operations on vectors are -- except for very specific cases -- great for making vectors forget that they're vectors.
+	\end{frame}
+
+	\begin{frame}{Elementwise Activation Functions}
+		You can probably all name dozens of these functions in common use. 
+
+		\begin{alignat*}{3}
+			\text{Sigmoid /Logit}& \hspace{1cm} && \sigma(x) &&  = \frac{1}{1 + \exp(-x)} 
+			\\
+			\text{Rectified Linear Unit (ReLU)  } & &&\text{Relu}(x) && = \begin{cases} x & x > 0 \\ 0 &\text{else} \end{cases}
+			\\
+			\text{Leaky ReLU  } & && \text{Lelu}(x) && = \begin{cases} x & x > 0 \\ 0.01x &\text{else} \end{cases} 
+			\\
+			\text{tanh} & && \tanh(x) && = \frac{\exp(x) - \exp(-x)}{\exp(x) + \exp(-x)}
+			\\
+			\text{Softplus} & && \text{sft}(x) && = \log\left( 1+ \exp(-x) \right)
+		\end{alignat*}
+
+		\textit{(Bonus Question: Can you name any commonly used functions which \textbf{don't} follow this pattern?)}
+	\end{frame}
+
+
+	\begin{frame}{NonLinearity Ahoy!}
+	
+		By replacing my (randomly initialised) hidden layers with Sigmoid nodes, I get:
+
+		\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{NonLinearMLP.png}
 	\end{frame}
 \end{document}
 
