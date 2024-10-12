@@ -18,6 +18,8 @@
 	\usepackage{tikz}
 	\usepackage{pgfplots}
 	\usepackage{wrapfig}
+	\newcommand\cec[1]{\tilde{\vec{#1}}}
+	\usetikzlibrary{decorations.pathreplacing,calligraphy}
 	\usepackage[framemethod=tikz]{mdframed}
 	\mdfdefinestyle{mpdframe}{
 		frametitlebackgroundcolor   =black!15,
@@ -389,7 +391,7 @@
 						
 		
 				
-		\chapter{Vectors \& Matrices}
+		\chapter{Vectors \& Matrices}\label{C:LinearAlgebra}
 
 			If I were being cruel and rigorous, I would begin this section by saying that vectors are 'abstract members of a Vector Space', defining them through abstract and ethereal properties, that seem to have no tangible link to 'a vector'. In this language, vectors can be anything; functions, matrices, abstract quantum states, websites\footnote{Yes, seriously, this is how Google's PageRank used to work!} and motorway junctions. 
 
@@ -629,7 +631,7 @@
 
 		
 	
-				\section{Affine Transformations}
+				\section{Affine Transformations}\label{S:Affine}
 
 					An important thing to note is that the following is \textbf{not} possible:
 					\begin{equation}
@@ -646,6 +648,8 @@
 						M \vec{x} + a M\vec{y} & = \left(\vec{x} + \vec{m}\right) + a \left( \vec{y} +\vec{m}\right) 
 						\\
 						&= M\left( \vec{x} + a\vec{y}\right) + a\vec{y}
+						\\
+						& \neq M\left( \vec{x} + a\vec{y}\right) \text{ when } a \neq 0
 					\end{spalign}
 					 Given that vector addition represents the \textit{translation} operation, what are we to do? Does this mean we cannot treat addition using our lovely formalism of linear algebra?
 					
@@ -967,7 +971,7 @@
 			% 			\pdiv{f}{\vec{x}} = \left( \vec{a} \cdot \vec{x} \right) \pdiv{\vec{x}}{\vec{x}} + \left(
 			% 		\end{equation}
 		
-		\chapter{Numerical Optimisation}
+		\chapter{Numerical Optimisation}\label{C:Optimisation}
 	
 			The above analysis of both single variable and multivariable calculus naturally lends itself to asking, therefore, how we may identify the maxima (or minima) of a function if analytically solving the derivative is impossible. 
 	
@@ -1317,186 +1321,886 @@
 
 		\chapter*{Introduction}
 
-			This part of the notes will (hopefully!) contain the information presented during the workshop, for you to review afterwards at your leisure. 
+			% This part of the notes will (hopefully!) contain the information presented during the workshop, for you to review afterwards at your leisure. 
 
-			At the current time, however, it is empty. You may ignore this section.
+			% At the current time, however, it is empty. You may ignore this section.
 
 
-		% \chapter{Training an MLP}
+			The first development in what we would recognise as modern `Machine Learning' was developed surprisingly early - as far back as the 1950s. This should give you a hint that a surprising amount of ML uses mathematics and theory which are (at least on the surface) relatively accessible: the difficulties which had to be overcome to make even simple Feedforward Neural Networks (FNNs) plausible were technological, not theoretical.
 
-		% 	Training an MLP is a fiddly business: the mathematics is actually rather simple (it is merely a recurrence relation on the chain rule) -- the difficulty is merely one of ensuring all the right parts end up in the right places. 
-
-		% 	For that reason, it is important to make sure we are clear about our notation. 
-
-		% 	The Cost function associated with the network is something which is \textbf{maximised} at when the network is performing well, and minimised when it is performing badly. 
-
-		% 	A decent first guess at the cost function would be the least squares function, evaluated across the entire corpus of data:
-		% 	\begin{equation}
-		% 		\mathcal{L}(\{\vec{x}\}, \{\vec{w}\}) = \sum_\text{data, $i$} \left( \mathcal{P}(\vec{x}_i) - L_i\right)^2
-		% 	\end{equation}
-		% 	Here $\mathcal{P}$ is the output of our network (the final output vector), and $L_i$ is the label of that data. If our network had a multidimensional output (so $\mathcal{P}$ and $L$ were vectors), we would upgrade this equation to being the dot product. 
-
-		% 	Our goal is to find the set of $\{\vec{w}\}$ which minimise this. Our goal, therefore, is simply to find the set:
-		% 	\begin{equation}
-		% 		\left\{ \pdiv{\mathcal{L}}{\vec{w}_j}  \right\}
-		% 	\end{equation}
-		% 	The problem, naturally, is that if we have $N$ nodes, then this is $N$ (vector) partial differential equations. Gross. 
-
-		% 	This is clearly going to be very fiddly, and so we make some simplifying assumptions about our notation:
-		% 	\begin{equation}
-		% 		{y}_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} ~~~~~ \vec{y}_i = \begin{pmatrix}
-		% 			y_i^1 \\ y_i^2 \\ y_i^3 \\ y_i^4 \\ \vdots 
-		% 		\end{pmatrix}
-		% 	\end{equation}
-		% 	That is, ${y}_i^j$ is the \textit{unactivated result} which comes out of node $j$ in layer $i$, and which can be packaged into the vector $\vec{y}_i$; the \textit{unactivated vector} associated with layer $i$.
-
-		% 	Each layer\footnote{It is common to say that the \textit{nodes} perform the activation. However, this is only really true in the case of separable functions. Things like softmax are better thought of as being done by the layer, as it requires knowledge of all the nodes in the layer!} then performs an activation transformation:
-		% 	\begin{equation}
-		% 		\vec{x}_i = \mathcal{A}_i(\vec{y}_i) ~~~~~~~ \tilde{\vec{x}}_i = \begin{bmatrix} 1 \\\mathcal{A}_i(\vec{y}_i)\end{bmatrix}
-		% 	\end{equation}
-		% 	If this is a separable transform, then it can be written as:
-		% 	\begin{equation}
-		% 		\tilde{\vec{x}_i} = \begin{pmatrix}
-		% 			1 \\ a_i\left( y_i^1\right) \\ a_i\left( y_i^2\right) \\ a_i\left( y_i^3\right)\\ a_i\left( y_i^4\right) \\ \vdots 
-		% 		\end{pmatrix}
-		% 	\end{equation}
-		% 	That is, it's a function which is repeated on each element of the vector. Non-separable functions exist and are in common usage: the softmax function, for instance is equal to:
-		% 	\begin{equation}
-		% 		\mathcal{A}_\text{softmax}(\vec{y}_i) = \frac{1}{\sum_j \exp(y_i^j)}\begin{pmatrix}
-		% 			\exp(y_i^1) \\ \exp(y_i^2) \\ \vdots 
-		% 		\end{pmatrix}
-		% 	\end{equation}
-		% 	Since $y_i^2$ requires knowledge of the value of $y_i^1$, this cannot be written as a separable activation function. We shall focus on separable activation functions for now.
-
-		% 	The problem is that our cost function is a horrible series of these functions. Taking the derivative is going to be wildly unpleasant. 
-		% % 	\begin{float}
-		% % 	For a simple 3-layer network, the problem looks like this:
-		% % 	\newcommand\afunc[2]
-		% % 	{
-		% % 		\mathcal{A}_{#1}\left(\begin{matrix}\vec{w}^1_{#1} \cdot#2 \\ \vec{w}^2_{#1} \cdot#2 \\  \vec{w}^3_{#1} \cdot#2  \\ \vdots \end{matrix} \right)
-		% % 	}
-		% % 	\begin{equation}
-		% % 		\mathcal{P}(\vec{d}_\text{input}) =  \afunc{3}{\afunc{2}{{\afunc{1}{\vec{d}_\text{input}}}}}
-		% % 	\end{equation}
-		% % \end{float}
-
-		% 	Luckily, there is an easier way. 
-
-		% 	We start by simplifying our gradient: rather than trying to compute the gradient of the whole dataset at once, we want to compute the gradient one datapoint at a time:
-		% 	\begin{equation}
-		% 		\mathcal{L} = \sum_i \mathcal{L}_i(\vec{d}_i)
-		% 	\end{equation}
-		% 	The single most important equation we will be using is this chain rule equation, which notes that:
-		% 	\begin{spalign}
-		% 		\pdiv{\mathcal{L}_i}{\vec{w}_i^j} & = \pdiv{\mathcal{L}}{y_i^j} \pdiv{y_i^j}{\vec{w}} 
-		% 		\\
-		% 		& \left( \text{recall } y_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} \right)
-		% 		\\
-		% 		& = \pdiv{\mathcal{L}}{y_i^j} \tilde{\vec{x}}_{i-1}
-		% 	\end{spalign}
-		% 	\textbf{This is why I suggested the route of augmenting vectors rather than adding the bias manually -- it makes your gradients trivially easy to compute as a whole, rather than having to do the bias separately!}
-
-		% 	This is easy to compute for the final layer, since $\mathcal{P} = \mathcal{A}(\vec{y_{N}})$, so we merely need to compute (we have assumed that the output $\vec{x}_N$ is a $q-$dimensional vector, with elements $x_N^i = a(y_N^i)$. If the output is a scalar, then $q = 1$ and you can ignore the $i$ labels)
-		% 	\begin{equation}
-		% 		\pdiv{\mathcal{L}_i}{y_N^i} = 2 \left(a(y_N^i) - L_N^i \right) \times \pdiv{}{y_N^i} a(y_N^i)
-		% 	\end{equation}
-		% 	We assume that (since we chose it) if $a_N(x)$ is the activation function of the $N^\text{th}$ layer, then we know that $d_N(x) = \pdiv{a_N}{x}$ is its derivative. We can then write:
-		% 	\begin{equation}
-		% 		\pdiv{\mathcal{L}_i}{y_N^i} = 2 \left(a(y_N^i) - L_N^i \right) \times d_N(y_N^i)
-		% 	\end{equation}
-		% 	And therefore:
-		% 	\begin{equation}
-		% 		\pdiv{\mathcal{L}_i}{\vec{w}_N} =  2 \left({x}^i_N- L_N^i \right) \times d_N(y_N^i) \tilde{\vec{x}}_{N-1}
-		% 	\end{equation}
-		% 	This is easy to compute \& calculate. One layer down, an unknown number to go....
-
-		% 	The next layer, down, however, can be trivially computed from the chain rule. Since the output from layer $p$, $\vec{y}_p$ is only directly used by the layer $p+1$, we can write:
-
-		% 	\begin{equation}
-		% 		y^i_{p+1} = f(\vec{y}_{p})
-		% 	\end{equation}
-		% 	Naturally, this is also a function of $p-1$, but only because $\vec{y}_p = f(\vec{y}_{p-1})$. Therefore, if we already know $\pdiv{\mathcal{L}}{y^i_{p+1}}$, then:
-		% 	\begin{equation}
-		% 		\pdiv{\mathcal{L}_q}{y_p^i} = \sum_{\text{nodes $j$ in $p+1$ layer}} \pdiv{y_{p+1}^j}{y_p^i} \pdiv{\mathcal{L}_q}{y_{p+1}^j}
-		% 	\end{equation}
-		% 	That is, the derivative with respect to the $y$ in layer $p$ is equal to (the sum of) the way in which $y_{p+1}$ affects $\mathcal{L}$, multiplied by the way in which $y_p$ affects $y_{p+1}$. 
-
-		% 	This seems relatively horrible to write out in mathematics, but we're almost there. 
-
-		% 	The final step is to write $\pdiv{y_{p+1}}{y_p}$ in terms of known variables. We recall that:
-		% 	\begin{equation}
-		% 		y^j_{p+1} = \vec{w}_{p+1}^j \cdot \begin{bmatrix} 1 \\ a_{p+1}(y_p^1) \\ a_{p+1}(y_p^2) \\ \vdots \end{bmatrix}
-		% 	\end{equation}
-		% 	Therefore:
-		% 	\begin{spalign}
-		% 		\pdiv{y^j_{p+1}}{y_p^i} &= \left[ \vec{w}_{p+1}^j \right]_{i+1} \div{}{y_{p}^j} a_{p+1}(y_p^i)
-		% 		\\
-		% 		& = \left[ \vec{w}_{p+1}^j \right]_{i+1} d_{p+1}(y_p^i)
-		% 	\end{spalign}
-		% 	\textbf{Note that the index of $[\vec{w}]$ is offset by one: $i+1$ not $i$. This is because of the bias term which sits at the first index of $\vec{w}$.}
-
-		% 	\newpage 
+			In this section we walk through the underlying mathematics and theory underpinning three increasingly complex forms of Machine Learning architecture: the Perceptron, the FNN and the Convolutional Neural Network (CNN). 
 			
-		% 	\subsubsection{Putting it All Together}
+			In doing so, we will chase a few wild geese and follow some deliberately engineered dead ends: in doing so we hope to illuminate why certain features are present, rather than simply forcing you to take them for granted. 
 
-		% 		This is a lot of maths. The upside is that it is relatively trivial to actually \textit{implement} within the neural network. 
+		\chapter{Perceptrons}
 
-		% 		In order to compute the gradients, we have:
-		% 		\begin{equation}
-		% 			\pdiv{\mathcal{L}_q}{y_\ell^i} = \begin{cases} \pdiv{\mathcal{L}_q}{P_q^i} \times d_N(y_N^i) & \text{ if $\ell = N-1$}
-		% 			\\
-		% 			d_\ell(y_\ell^i) \sum_{j}  \left[ \vec{w}_{\ell+1}^j \right]_{i+1} \pdiv{\mathcal{L}}{y_{\ell+1}^j}
+			The Perceptron was developed in the 1950s as one of the first demonstrations of machine intelligence. 
+			
+			The Perceptron classification algorithm is incredibly simple: it outputs a 1 or a 0, depending on the assigned class of the input vector $\vec{x}$. The algorithm for assigning this class is simple:
+
+			\begin{equation}
+				\mathcal{P}_{\vec{w}}(\vec{x}) = \begin{cases} 1 & \text{if } \vec{w} \cdot \begin{bmatrix}
+					1 \\ \vec{x}
+				\end{bmatrix} > 0 \\ 0 & \text{else} \end{cases}
+			\end{equation}
+			If $\vec{x}$ is an $n$ dimensional vector, then $\vec{w}$ is an $n+1$ dimensional vector. 
+
+			\begin{aside}
+
+				\subsubsection{Biases vs. Augmentation}
+
+					In the above notation, I treated $\vec{w}$ as an $n+1$ dimensional vector, and produced an `augmented' vector with which to perform the dot product:
+					\begin{spalign}
+						\vec{w} \cdot \tilde{\vec{x}} & = \vec{w} \cdot \begin{bmatrix}
+							1 \\ \vec{x}
+						\end{bmatrix}
+						\\
+						& = \begin{pmatrix}
+							w_0 \\ w_1 \\ w_2 \\ \vdots 
+						\end{pmatrix} \cdot \begin{pmatrix}
+							1 \\ x_0 \\ x_1 \\ \vdots
+						\end{pmatrix}
+						\\
+						& = w_0 + x_0 w_1 + x_1 w_2 + \cdots
+					\end{spalign}
+					The same effect could have been achieved by letting $\vec{w}$ be an $n$ dimensional vector and rewriting the equation as:
+					\begin{spalign}
+						b + \vec{w} \cdot \vec{x} & = b + \begin{pmatrix}
+							w_0 \\ w_1 \\ w_2 \\ \vdots 
+						\end{pmatrix}\cdot \begin{pmatrix}
+							x_0 \\ x_1 \\ x_2 \\ \vdots 
+						\end{pmatrix}
+						\\
+						& = b + w_0 x_0 + w_1 x_1 + \cdots
+					\end{spalign}
+					We can see that aside from some renaming ($w_0 \to b$, and $w_i \to w_{i-1}$) these are the same equation.
+
+					These two methods are equivalent. However, when it comes to training our neural network and taking derivatives, it is generally more helpful to be able to treat $\vec{w}$ as a singular object, rather than having to remember to grab the bias term separately.
+
+					Except when making a point, therefore, I will stick to using the augmentation formalism. Augmented vectors are denoted as follows:
+					\begin{equation}
+						\tilde{\vec{x}} = \begin{bmatrix}
+							1 \\ \vec{x}
+						\end{bmatrix}
+					\end{equation}
+					This is deeply connected to the idea of Affine Transformations, which are discussed on page \pageref{S:Affine}.
+
+			\end{aside}
+
+			\section{The Perceptron Workings}
+
+				Those familiar with Linear Algebra know that $\vec{n} \cdot \vec{x} = \text{const}$ defines a \textit{Plane} in $n$-dimensional space. The Perceptron algorithm serves to split the $n$-dimensional plane into two parts, and then compare whether the datapoint lies above or below the plane. 
+
+				In 2 dimensions, this is simple: the 2D-splitting plane is simply a \textit{line}. If the input data is $(x,y)$, then the Perceptron simply serves to compute if the datapoint lies above or below the line. 
+
+				\subsection{Why $n+1$ weights?}
+
+					If the Perceptron simply serves to split the plane into two parts, it is natural to ask how many variables are needed to do that. In short: how big should our weight vector be?
+
+					As you should be familiar with from years of high school maths, a line in $2D$ space requires only 2 parameters to specify. You're most familiar with them in the following form:
+					\begin{equation}
+						y = mx + c ~~~\Longrightarrow \text{line specified by } (m,c)
+					\end{equation}
+					This holds in higher dimensions: to split an $N$ dimensional space into two parts with a plane requires $N$ dimensions. 
+
+					So why does the perceptron need $n+1$ parameters?
 					
-		% 			\end{cases}
-		% 		\end{equation}
-		% 		Where $\pdiv{\mathcal{L}_q}{P_q^i}$ is the derivative of your chosen cost function, and $d_N(y)$ is the derivative of the $N^\text{th}$ layer's activation function. Having computed all of these values, it is therefore trivial to find:
-		% 		\begin{equation}
-		% 			\pdiv{\mathcal{L}_q}{\vec{w}_\ell^i} = \pdiv{\mathcal{L}_q}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
-		% 		\end{equation}
+					\subsubsection{The Incorrect Answer}
 
-		% 		This seems imposing, so it is worth reiterating what is happening.
-		% 		\begin{itemize}
-		% 			\item We first start by passing the information \textit{forward} through the network, in order to compute our values of $\vec{y}$, and $\tilde{\vec{x}}$ since we need these to compute the gradients.
-		% 			\item We then move to the back of the network by first computing how the score changes if the prediction changes. This is $\pdiv{C_q}{P_q^i}$: it tells us how the score $(C)$ of the $q^\text{th}$ datapoint changes when we tweak the value of $P$, the prediction. 
-		% 			\item The final layer of the network (the one which makes $P$) then uses this information to work out how $P$ changes when it tweaks its unactivated values, $\vec{y}$. It then uses this to work out how the score $\mathcal{L}$ changes when $y$ is tweaked: this is $\pdiv{\mathcal{L}}{y_N}$. 
-		% 			\item Th next layer down then works out how much $\vec{y}_N$ changes when the layer $N-1$ tweaks \textit{it's} unactivated values. The rate at which $\mathcal{L}$ changes in response is just the product of the higher layer's gradients times these internal tweak values, giving us $\pdiv{\mathcal{L}}{y_{N-1}}$
-		% 			\item Then we repeat through the network, each time using the upper layer's gradient to compute the gradient of the next layer. 
-		% 			\item When we reach the first layer, we are almost done.
-		% 			\item We then go back through the network and use $\pdiv{\mathcal{L}}{y}$ to compute $\pdiv{\mathcal{L}}{\vec{w}}$ -- this is a simple multiplication!
-		% 		\end{itemize}
-			% We start by noting that, for some vector $\vec{z}$:
-			% \begin{equation}
-			% 	\pdiv{\mathcal{L}}{\vec{z}} = \sum_\text{data $i$} 2 \left( \mathcal{P}(\vec{d}_i) - L_i\right) \pdiv{\mathcal{P_i}}{\vec{z}}
-			% \end{equation}
-			
-			% This is easy to compute for the final layer in the network, because (assuming that $P$ is a $q$-dimensional vector)
-			% \begin{spalign}
-			% 	\mathcal{P} & = \mathcal{A}_N({\vec{y}_N})
-			% 	\\
-			% 	& =\afunc{N}{\tilde{\vec{x}}_{N-1}}
-			% \end{spalign}
-			% We can therefore write:
-			% \begin{spalign}
-			% 	\pdiv{\mathcal{P}}{\vec{w}_N^j} =  \pdiv{\mathcal{P}^j}{y^j_N} \pdiv{{y}_N^j}{\vec{w}^j_N} 
-			% \end{spalign}
-			% This is our basic vector chain rule.
-			
-			% 
-			% \begin{spalign}
-			% 	\pdiv{\mathcal{P}}{\vec{w}_N^j} =  d_N(y_N^j) \times \tilde{\vec{x}}_{N-1}
-			% \end{spalign}
-			% And therefore:
-			% \begin{equation}
-			% 	\pdiv{\mathcal{L}}{\vec{w}_N^j} = \sum_\text{data $i$} 2 \left( \mathcal{P}(\vec{d}_i) - L_i\right)d_N(y_N^j) \times \tilde{\vec{x}}_{N-1}
-			% \end{equation}
-			% \textbf{This is why I suggested the route of augmenting vectors rather than adding the bias manually -- it makes your gradients trivially easy to compute as a whole, rather than having to do the bias separately!}
+						It is incredibly disappointing to see that in many places online, an \textit{utterly false} answer is found absolutely everywhere. 
 
-			% OK. So the final layer is doable. What about the next layer down?
+						You will see many people claiming that the answer lies in the \textit{bias} term: that this is needed to fulfill to role of $c$ in our line equation: of permitting planes which do not go through the origin of the space. 
 
-			% In this case, we find that:
+						\textbf{This is false.}
 
-			% \begin{equation}
+					\subsubsection{Why this is Wrong}
+
+						It is true that if you write only $\vec{x} \cdot \vec{w}$ then you can only specify planes which go through the origin. 
+
+						So....don't write it like that?
+
+						If we wanted to write a perceptron algorithm which used the minimal number of dimensions we would not use the dot product notation. Instead (in 2D), we would simply write:
+						\begin{equation}
+							\mathcal{P}(x,y) = \begin{cases} 1 & y> mx + c \\ 0 &\text{else} \end{cases}
+						\end{equation}
+
+						In arbitrary $n$ dimensions, this would be:
+						\begin{equation}
+							\mathcal{P}(\vec{x})= \begin{cases} 1 & x_{N-1} > \sum_{i=0}^{N-2} w_i x_i + c \\ 0 & \text{else} \end{cases}
+						\end{equation}
+						And there we have it: we have written a perceptron classifier using only $n$ free parameters, right? The dot product notation was the problem, not the bias!
+						
+						We did indeed need the bias (written as either $b$ or $c$), but what we \textit{didn't} need was the $n$-dimensional bit of $\vec{w}$. We only needed $n-1$ of those dimensions. Pointing to the bias as the source of the extra dimensions is incorrect, as we have just proven.
+
+					\subsubsection{The True Answer}
+
+						The above classifier works if and only if you want to split the plane into two parts, \textbf{but do not care which label is given to which part}. 
+
+						Consider the following classifier with $m = 1$ and $c = 2$.
+
+						\begin{center}
+							\begin{tikzpicture}
+							
+							\begin{axis}[xmin = 0, xmax = 5, ymin = 0, ymax = 8, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+											\addplot[domain = 0:5, samples = 200,black]{x + 2} node[midway,above,rotate=30] {$y = x + 2$};
+											% \addplot[domain = 0:2, samples = 200,blue]{1-x};
+
+
+											\addplot[mark=*, blue] coordinates {(1,1)} node[above] {(1,1)};
+											\addplot[mark=*, blue] coordinates {(4,5)} node[above] {(4,5)};
+											\addplot[mark=*, blue] coordinates {(3,2)} node[above] {(3,2)};
+
+											\addplot[mark=*, red] coordinates {(2,6)} node[above] {(2,6)};
+											\addplot[mark=*, red] coordinates {(0.5,3)} node[above] {(0.5,3)};
+											\addplot[mark=*, red] coordinates {(3.5,7)} node[above] {(3.5,7)};
+
+										\end{axis}
+							
+							\end{tikzpicture}
+							\end{center}
+							The points in blue have a label of $+1$, and the points in red have a label of 0.
+
+							We can see that the specified line perfectly divides the points \textbf{but misclassifies every single one}. The red points lie above the line, and so satisfy $y > x + 2$ (and so have $\mathcal{P} = 1$), whilst the blue points lie below the line ($\mathcal{P} = 0$).
+
+							The issue is not the separation of the regions, it is in the \textbf{direction} that the comparison operator looks, if our classifier had tested $y < x + 2$ instead of $y > x+2$ then it would work perfectly. 
+
+							However, there is in general no way to know in advance which direction is needed, and so this failed. 
+
+							This is where our extra dimension comes in handy. Consider the dot product $\vec{w} \cdot \tilde{\vec{x}}$ in two dimensions:
+
+							\begin{spalign}
+								\vec{w} \cdot \tilde{\vec{x}} & > 0
+								\\
+								w_0 + w_1 x + w_2 y & > 0
+								\\
+								w_2 y & > -w_1 c - w_0
+							\end{spalign}
+							If we let $w_1 = -m$ and $w_0 = -c$ then:
+							\begin{spalign}
+								w_2 y > m x + c
+							\end{spalign}
+							This is exactly as we expect. However, if we divide by $w_2$ we need to be careful, and recall how inequality operators (mis)behave when you multiply or divide by negative numbers:
+							\begin{spalign}
+								w_2 y > mx + c ~~~~ \longrightarrow ~~~ \begin{cases}
+									 y > \frac{mx + c}{w_2} & w_2 > 0 
+									 \\
+									 y < \frac{mx + c}{w_2} & w_2 < 0
+								\end{cases}
+							\end{spalign}
+
+							We see that the \textit{sign} of $w_2$ changes the direction of the comparison operator. If $w_2$ is negative then we look below the line, and if $w_2$ is positive then we look above it. 
+
+							This is where our extra dimension comes from. Technically speaking, we could get away with simply defining $(m,c)$ and then a direction (either $\pm 1$), but it turns out that if we're going to the trouble of having an extra dimension anyways, then it helps the convergence if we give the line the full freedom to move $w_2$ around as it wants -- this, for instance, allows the line to pivot around smoothly wihtout undergoing drastic changes when the direction changes.
+
+							So why do we need $n+1$ dimensions? Because we don't just need to split the line into two parts, but also assign each part a specific label.
+
+							This is naturally tied in with the idea of the bias, but the bias itself is not the cause, since an alternative formulation which includes a bias term suffers from the same problem!
+
+				\subsection{Training a Perceptron}
+
+						Being able to compute a prediction $\mathcal{P}$ from $\vec{x}$ is all very well and good, but how do we determine what $\vec{w}$ is?
+
+						In order to do that we need to have a \textit{training set} - a series of data points $\vec{x}_i$ which each have their own true label $L_i$.
+
+						The Perceptron training algorithm is very simple:
+						\begin{itemize}
+							\item Loop through the data, and make a prediction $\mathcal{P}(\vec{x}_i)$.
+							\item If $\mathcal{P}_i \neq L_i$ (i.e. the prediction is wrong), update the weights according to:
+							$$ \vec{w} \to \vec{w}^\prime  = \vec{w} + r \times(L_i - \mathcal{P}_i ) \tilde{\vec{x}}$$
+							\item Repeat until either a set number of loops has completed, or until all predictions are correct.
+						\end{itemize}
+
+						Here $r > 0$ is the `learning rate' and determines by how much the weights get updated: small values mean many loops will take to converge (but it won't miss narrow optima), large values mean it will jump around quickly (but might miss the optima).
+
+						\subsubsection{Why does this update formula work?}
+						
+							If the update formula is being called, then $\mathcal{P}_i \neq L_i$, and we have two options:
+							\begin{enumerate}
+								\item $L_i = 0$ (and so $\mathcal{P}_i = 1$). This means $\vec{w} \cdot \tilde{\vec{x}}_i > 0$, and so we want $\vec{w}^\prime \cdot \tilde{\vec{x}}_i$ to be \textit{smaller}.
+								\item $L_i = 1$ (and so $\mathcal{P}_i = 0$). This means $\vec{w} \cdot \tilde{\vec{x}}_i \leq 0$, and so we want $\vec{w}^\prime \cdot \tilde{\vec{x}}_i$ to be \textit{bigger}.
+							\end{enumerate}
+
+							If we compute the new dot product after the weights have been updated:
+							\begin{spalign}
+								\vec{w}^\prime \cdot \tilde{\vec{x}}_i = \vec{w} \cdot \tilde{\vec{x}}_i + r \left( L_i - \mathcal{P}_i \right) |\tilde{\vec{x}}_i|^2
+							\end{spalign}
+							By definition, both $r$ and $|\tilde{\vec{x}_i}|^2$ are positive, and so:
+							\begin{spalign}
+								\vec{w}^\prime \cdot \tilde{\vec{x}}_i &= \vec{w} \cdot \tilde{\vec{x}}_i + \text{positive} \times (L_i - \mathcal{P}_i)
+								\\
+								& = \vec{w} \cdot \tilde{\vec{x}}_i + \begin{cases} \text{positive} & L_i = 1
+									\\
+									\text{negative} & L_i = 0\end{cases}
+							\end{spalign}
+
+							We can therefore see that he new dot product gets bigger if $L_i = 1$ and gets smaller if $L_i = 0$. This pushes the dot product towards 0, and hence towards the value at which its decision will change.
+
+							This explains why $\tilde{\vec{x}}$ appears in the update formula: it is a vector $\vec{v}$ for which it is guaranteed that $\vec{v} \cdot \tilde{\vec{x}} > 0$, and hence improve the prediction -- we could replace it by any linear scaling of $\tilde{\vec{x}}$ (for instance, $\vec{v} = \frac{1}{|\tilde{\vec{x}}|} \tilde{\vec{x}}$), but it has to point in the same direction.
+			\section{Linearity \& Perceptrons}
+
+				One major limitation of Perceptrons is their inherent linearity: by definition they split the $n$ dimensional spaces into 2 parts using a $n-1$ dimensional hyperplane. With our $n+1$ parameters we may have given them the freedom to choose which side to give which labels, but nothing yet gives them the ability to draw a curved line to disentangle data.
+
+				We \textit{can} get around this, however -- all within the framework of a simple perceptron. 
 				
-			% \end{equation}
+				We consider augmenting our input vector with \textit{non-linear combinations of the input features.}
+
+				For instance:
+				\begin{equation}
+					\begin{pmatrix}
+						x \\ y
+					\end{pmatrix} \to \begin{pmatrix}
+						1 \\ x \\ y \\ x^2 \\ xy \\ y^2
+					\end{pmatrix}
+				\end{equation}
+			
+				In doing so we project our input vector into a higher order space (in this case, the 5-dimensional space), and because this projection ocurred in a non-linear fashion, when the Perceptron draws a line through the space and projects it back down into 2D, the result will look like a curved line. 
+
+				This particular choice permits the classification of all possible hyperbolically-separable spaces, instead of just the linearly separable spaces. We can extend the dimensionality even further:
+				\begin{equation}
+					\begin{pmatrix}
+						x \\ y
+					\end{pmatrix} \to \begin{pmatrix}
+						1 \\ x \\ y \\ x^2 \\ xy \\ y^2 \\ x^3 \\ x^2 y \\ x y^2 \\ y^3 \\ \vdots \\x^{210} y^{100} \\ x^{209} y^{101} \\ \vdots
+					\end{pmatrix}
+				\end{equation}
+				In doing so we leverage the power of Taylor expansions, and can therefore use this to separate \textbf{all possible analytically separable classes}.
+
+				That's right: a single perceptron node can, with suitable modifications, work on arbitrary analytical spaces. Forget what you've been told about the XOR problem!
+
+				\begin{aside}
+					This isn't anything new: this is a variation on what is known as the `kernel trick' in SVM terminology, but I rarely see it put into these terms!
+
+					The Kernel Trick varies in that it doesn't require an explicit mapping, relying instead on similarity measures; but it remains the case that for any specified `Kernel Trick' you can decompose it into a non-linear predictor above (doing so is often intractable however, even if theoretically possible).
+				\end{aside}
+
+				The problem with this is twofold: it gets complicated \textit{really} fast. As soon as you include terms of suitably high order (I personally had trouble above 8th order), the convergence of your perceptron is absolutely terrible unless you dive in and hold its hand: the higher order terms will flip flop like crazy. Even with $r$ tiny, each update will completely alter your decision boundaries. 
+
+				This is why things like the Kernel Trick exist: they permit this kind of behaviour in a much more controlled fashion, allowing the additional dimensionality and flexibility, without the penalty of accidentally altering $\vec{w}$ by an amount equal to $10^{85}$.
+
+				In short, whilst the Perceptron is, contrary to what you may have heard, capable of dealing with ludicrously non-linear classification tasks, the formulation is poorly suited for them. 
+				
+				We need something more powerful....maybe some \textit{layers}?
+
+		\chapter{Multi-Layer Perceptrons}
+
+			We saw that, in the case of the non-linear perceptron that, if we project our vector $\vec{x}$ into some high dimensional space, then it was possible for the classifier to then `thread the needle' and draw a decision boundary which was a straight line in the high dimensional space, but a curved shape in the output space. 
+
+			The problem, as we saw, was that this projection had to be manually encoded and resulted in highly unstable behaviour. 
+			
+			\section{The Naive Perceptron}
+				The basic principle of a multi-layer perceptron is that we abstract this projection process into another learnable process: rather than forming our nonlinear vector ourselves, we let the machine learn what would be a good way to manipulate the data -- using a series of individual perceptrons.
+
+				The prediction algorithm then becomes:
+				\begin{itemize}
+					\item Take our input vector, $\vec{x}$ and pass it into an array of perceptrons. Each perceptron -- called a `node' or a `neuron' then performs a dot product $\vec{w}_i \cdot \tilde{\vec{x}}$. We then collect the results into a new vector $\vec{x}_\text{processed}$
+					\item We then repeat this an arbitrary number of times, taking our vector, passing into through an array of neurons, and then collecting the result into a vector, and passing it on to the next `layer' of neurons.
+					\item We can then the output of this highly dimensional process as the input to our `decision' node which performs the usual perceptron algorithm.
+				\end{itemize}
+				A schematic of this kind of perceptron is shown in Fig. \ref{F:Naive}.
+
+				This algorithm is rather simple to code up: it simply requires a way to pass information through the layer. However, if one writes it up a problem will become obvious even without training. 
+
+				If one randomly initialises the weights in all of the nodes and plots the values of the prediction across a range of values -- as is done in figure \ref{F:Linear} -- it becomes very clear that something has gone awry.
+
+				Despite projecting up into our high-dimensional space, \textbf{the decision boundary is still a straight line}! This is despite our projections going up into a 5D space, down into 3D and before going into 1D.
+
+				\begin{figure*}
+					\begin{center}
+			
+					\begin{tikzpicture}
+						\draw (0,0) circle (0.4);
+						\node at (0,0) {\footnotesize Input};
+						\draw[->] (0.5,0)--++(0.5,0);
+						% \foreach \i[count=\j from 0] in {2,1,...,-2}
+						% {
+						% 	\def\r{0.3}
+						% 	\def\y{\i/2}
+						% 	\def\x{1}
+						% 	\draw[->] (0.43,0)--({\x-\r-0.07},\y);
+						% 	\draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+						% 	\node at (\x,{\y}) {\fontsize{1}{0}\selectfont $[\vec{x}_0]_\j$};
+						% }
+						\def\baseheight{-5}
+						\draw [decorate, decoration = {calligraphic brace}] (1.4,\baseheight) --node[below]{Input layer}  (-1,\baseheight);
+						\draw [decorate, decoration = {calligraphic brace}] (5.9,\baseheight) --node[below]{Hidden layer 1}  (1.5,\baseheight);
+						\draw [decorate, decoration = {calligraphic brace}] (9.7,\baseheight) --node[below]{Hidden layer 2}  (6,\baseheight);
+						\draw [decorate, decoration = {calligraphic brace}] (16,\baseheight) --node[below]{Output layer}  (11,\baseheight);
+						% \draw [decorate, decoration = {calligraphic brace}] (1.3,1.2) --  (1.3,-1.2);
+						\node[anchor=west] at (1,0) {$\vec{x}_0$};
+			
+						\foreach \i[count=\j from 0] in {3,2,...,-3}
+						{
+							\def\r{0.46}
+							\def\y{\i}
+							\def\x{3}
+							\draw[->] (1.8,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{1,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$x_{1}^{\j}$};
+						}
+						\draw [decorate, decoration = {calligraphic brace}] (4.8,3) --  (4.8,-3);
+						
+						\node[anchor=west] at (5,0) {$\vec{x}_1$};
+			
+						\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+						{
+							\def\r{0.46}
+							\def\y{\i+\r}
+							\def\x{7}
+							\draw[->] (5.6,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{2,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$x_{2}^{\j}$};
+						}
+						\draw [decorate, decoration = {calligraphic brace}] (8.7,2.6) --  (8.7,-2.6);
+						\node[anchor=west] at (8.85,0) {$\vec{x}_2\hdots\hdots\vec{x}_{n-1}$};
+						\foreach \i[count=\j from 0] in {0}
+						{
+							\def\r{0.46}
+							\def\y{\i}
+							\def\x{13}
+							\draw[->] (11.3,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{n,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$x_{n}^{\j}$};
+						}
+						% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+						\node[anchor=west] at (14.2,0) {$\mathcal{P} = \begin{cases} 1 & x_n > 0 \\ 0 &\text{else}\end{cases}$};
+					\end{tikzpicture}
+					
+					\end{center}\caption{A ``Na\"ive MLP'' showing the multiple layers of dot products and collection, before a final perceptron layer.}\label{F:Naive}
+				\end{figure*}
+
+
+				\begin{figure*}
+					\newcommand\image[1]
+					{
+						\includegraphics[width=0.4\linewidth,keepaspectratio=true]{../Presentation/Images/#1}
+					}
+					\begin{tabular}{cc}
+						\image{linear_1} & \image{linear_2} \\ \image{linear_3} & \image{linear_4}
+					\end{tabular}
+					\caption{The predictions of 4 randomly initialised ``naive MLP''s with dimensionality (5-3-1). The predictions for a 200x200 array of values between (-10,10) are shown. Predictions of label 0 are in red, label 1 in blue.}\label{F:Linear}
+				\end{figure*}
+
+				\subsection{What Went Wrong}
+
+					What has gone wrong here is, in fact, rather embarrassing.
+					
+					If we recall chapter \ref{C:LinearAlgebra}, the definition of matrix multiplication amounted to:
+					\begin{spalign}
+						W\vec{x} & = \begin{bmatrix}
+							\vec{w}_0 \\ \vec{w}_1 \\ \vec{w}_2 \\ \vdots 
+						\end{bmatrix} \vec{x}
+						\\
+						& = \begin{pmatrix}
+							\vec{w}_0 \cdot \vec{x} \\ \vec{w}_1 \cdot \vec{x} \\ \vec{w}_2 \cdot \vec{x} \\ \vdots
+						\end{pmatrix}
+					\end{spalign}
+					That is, matrix multiplication is equal to taking the dot product of each row of a matrix with the vector, and then stacking the results into a vector. If we observe Fig \ref{F:Naive} then ``taking the dot product and stacking them into a vector'' is \textit{precisely} what we are doing. 
+
+					Each layer in the network is computing the matrix product with $W_n$, the matrix formed from stacking all of our weights in the $n^\text{th}$ layer into a matrix:
+					\begin{equation}
+						\vec{x}_n = W_n \tilde{\vec{x}}_{n-1}
+					\end{equation}
+					Or (if we recall our Affine/augmentation conversation in Chapter \ref{S:Affine}), this is equal to:
+					\begin{equation}
+						\vec{x}_n = \mathcal{W}_n\vec{x} = W_n^\prime \vec{x} + \vec{b}_n
+					\end{equation}				
+					Where $W_n = [\vec{b}_n W_n^\prime]$ are the weight/bias components of $W_n$, and $\mathcal{W}_n$ is a general Affine transformation. 
+					
+					The final output of our network is therefore a stack of these Affine transformations: matrix multiplications plus bias offsets:
+					\begin{spalign}
+						\vec{x}_n &= \mathcal{W}_n \mathcal{W}_{n-1} \mathcal{W}_{n-2} \cdots \mathcal{W}_2 \mathcal{W}_1 \vec{x}_\text{inputs}
+						\\
+						& = \vec{b_n} + W_n\left( \vec{b}_{n-1} + W_{n-1} \left( \cdots W_2\left(\vec{b_1} + W_1\vec{x}_\text{inputs}\right) \right)\right)
+					\end{spalign}
+					Whilst this looks horrible and awful, we recall that affine transforms are associative, which means we can write \textbf{all of this as a single affine transformation} or, in other words 
+					\begin{spalign}
+						\vec{x}_n & =\mathcal{W}^\prime \vec{x}_\text{input}
+						\\
+						& = \vec{b}^\prime + W^\prime \vec{x}_\text{input}
+					\end{spalign}
+					And since our final layer has dimension 1 (a scalar)\dots
+					\begin{equation}
+						x_n = b + \vec{w} \cdot \vec{x} = \vec{w} \cdot \cec{x}
+					\end{equation}
+					\textbf{All of this reduces back down into a single perceptron predictor.} All of our layers and increased dimensionality \textbf{did absolutely nothing}. Diddly squat.
+
+					This network is essentially a very long, very convoluted way of computing a single dot product. Well done us. 
+
+
+			\newpage
+			\section{The Feedforward Neural Network}
+
+				OK. Well that didn't go to plan, did it? Those of you familiar with neural network architecture might have thought we were onto a winner, there. 
+
+				What went wrong, however, was that we were attempting to induce non-linearity\footnote{or at least, non-affine-ness, which is a mathematically important distinction, if not a conceptually important one! You may assume I am using affine and linear as essentially synonymous.}...using linear operations. 
+
+				We projected into a higher dimensional space, hoping this would let us draw nice warped lines as straight lines -- but our method of projecting was inherently linear. It was a doomed endeavour from the beginning. 
+
+				Luckily, there is a simple solution to this: \textbf{do something non-linear to the vectors}. 
+
+				It really is as simple as that. Instead of collecting the output of each node into $\vec{x}$ to be converted into $\cec{x}$ and passed onto the next layer of the network, we collect them into a temporary vector $\vec{y}$, and then perform some non-linear operation on that vector - the result of which is then used as $\vec{x}$. This function might vary between each layer, and so we denote it as $\mathcal{F}_n$:
+				\begin{equation}
+					\vec{y}_n = \mathcal{W}_n \vec{x}_{n-1} ~~~~~~ \vec{x}_n = \mathcal{F}_n(\vec{y}_n)
+				\end{equation}
+				An example of this kind of function is shown in Fig. \ref{F:Activated}, and it might start to look familiar!
+				\begin{figure*}
+					\begin{center}
+			
+					\begin{tikzpicture}
+						
+						% \foreach \i[count=\j from 0] in {2,1,...,-2}
+						% {
+						% 	\def\r{0.3}
+						% 	\def\y{\i/2}
+						% 	\def\x{1}
+						% 	\draw[->] (0.43,0)--({\x-\r-0.07},\y);
+						% 	\draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+						% 	\node at (\x,{\y}) {\fontsize{1}{0}\selectfont $[\vec{x}_0]_\j$};
+						% }
+						\def\baseheight{-5}
+				
+						% \draw [decorate, decoration = {calligraphic brace}] (1.3,1.2) --  (1.3,-1.2);
+						\node[anchor=west] at (1,0) {$\vec{x}_0$};
+			
+						\foreach \i[count=\j from 0] in {3,2,...,-3}
+						{
+							\def\r{0.46}
+							\def\y{\i}
+							\def\x{3}
+							\draw[->] (1.8,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{1,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$y_{1}^{\j}$};
+						}
+						\draw [decorate, decoration = {calligraphic brace}] (4.3,3) --  (4.3,-3);
+						
+
+						\node[rotate=0,anchor=west,draw] at (4.5,0) {\scriptsize $\begin{matrix} \vec{x}_1 = \\\mathcal{F}_1(\vec{y}_1)\end{matrix}$};
+			
+						\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+						{
+							\def\r{0.46}
+							\def\y{\i+\r}
+							\def\x{7}
+							\draw[->] (5.8,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{2,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$x_{2}^{\j}$};
+						}
+						\draw [decorate, decoration = {calligraphic brace}] (8.7,2.6) --  (8.7,-2.6);
+						% \node[anchor=west] at (8.85,0) {$\vec{x}_2\hdots\hdots\vec{x}_{n-1}$};
+
+						\node[rotate=0,anchor=west,draw] at (8.8,0) {\scriptsize $\begin{matrix} \vec{x}_2 = \\\mathcal{F}_2(\vec{y}_2)\end{matrix}$};
+						\node at (10.3,0) {...};
+						\node[rotate=0,anchor=west,draw] at (10.5,0) {\scriptsize $\begin{matrix} \vec{x}_{n-1} = \\\mathcal{F}_{n-1}(\vec{y}_{n-1})\end{matrix}$};
+						\foreach \i[count=\j from 0] in {0}
+						{
+							\def\r{0.46}
+							\def\y{\i}
+							\def\x{13.5}
+							\draw[->] (12.5,0)--({\x-\r-0.1},\y);
+							\draw (\x,{\y}) circle ({\r});
+							\node at (\x,{\y}) { $\vec{w}_{n,\j}$};
+							\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+							\def\xx{\x+\r+0.3}
+							% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+							\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$y_{n}^{\j}$};
+						}
+						\draw [->] (14.75,0)--++(0.5,0);
+						\node[rotate=0,anchor=west,draw] at (15.5,0) {\scriptsize $\begin{matrix} \vec{x}_\text{out} = \\\mathcal{F}_{n}(\vec{y}_{n})\end{matrix}$};
+						% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+						% \node[anchor=west] at (14.2,0) {$\mathcal{P} = \begin{cases} 1 & x_n > 0 \\ 0 &\text{else}\end{cases}$};
+					\end{tikzpicture}
+					
+					\end{center}\caption{An ``Activated MLP'' showing the multiple layers of dot products and collection, followed by a non-linear function $\mathcal{F}$.} \label{F:Activated}
+				\end{figure*}
+				There is practically no limit to what $\mathcal{F}$ can be: all it has to be is \textit{not} be equivalent to an Affine transform, which is a pretty broad scope. 
+
+				\subsection{Activation Functions}
+
+					Perhaps the \textit{easiest} way to come up with a non-linear function is to come up with a nice scalar function and then \textit{do it to each element of the vector}. 
+
+					Generally speaking, so long as the function is anything other than a $f(x) = a x +b$, the result is a nonlinear function:
+					\begin{equation}
+						\mathcal{F}(\vec{y}) = \begin{pmatrix}
+							f(y_0) \\ f(y_1) \\ f(y_2) \\ f(y_3) \\ \vdots \\ f(y_n)
+						\end{pmatrix}
+					\end{equation}
+					When you use a function like this, it can be helpful to think of it as being computed simultaneosly with $y_i$ that is, by the individual nodes themselves. You will therefore commonly see things such as the network depicted in Fig. \ref{F:SepAct}, where this scalar function -- called the `activation function' -- is treated as part of the dot product/node operation.
+
+
+					\begin{figure*}
+						\begin{center}
+				
+						\begin{tikzpicture}
+						
+						
+							\def\baseheight{-5}
+							
+							\node[anchor=west] at (1.3,0) {$\vec{x}_0$};
+				
+							\foreach \i[count=\j from 0] in {3,2,...,-3}
+							{
+								\def\r{0.46}
+								\def\y{\i}
+								\def\x{3}
+								\draw[->] (1.8,0)--({\x-\r-0.1},\y);
+								\draw (\x,{\y}) circle ({\r});
+								\node at (\x,{\y}) { $\cec{w}_{1,\j}$};
+								\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+								\def\xx{\x+\r+0.3}
+								% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+								\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$\phi_{1}(y_{1}^{\j})$};
+							}
+							\draw [decorate, decoration = {calligraphic brace}] (4.8,3) --  (4.8,-3);
+							
+							\node[anchor=west] at (5,0) {$\vec{x}_1$};
+				
+							\foreach \i[count=\j from 0] in {2,1,0,-1,-2,-3}
+							{
+								\def\r{0.46}
+								\def\y{\i+\r}
+								\def\x{7}
+								\draw[->] (5.6,0)--({\x-\r-0.1},\y);
+								\draw (\x,{\y}) circle ({\r});
+								\node at (\x,{\y}) { $\cec{w}_{2,\j}$};
+								\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+								\def\xx{\x+\r+0.3}
+								% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+								\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$\phi_{2}(y_{2}^{\j})$};
+							}
+							\draw [decorate, decoration = {calligraphic brace}] (8.7,2.6) --  (8.7,-2.6);
+							\node[anchor=west] at (8.85,0) {$\vec{x}_2\hdots\hdots\vec{x}_{n-1}$};
+							\foreach \i[count=\j from 0] in {1,0,-1}
+							{
+								\def\r{0.46}
+								\def\y{\i}
+								\def\x{13}
+								\draw[->] (11.3,0)--({\x-\r-0.1},\y);
+								\draw (\x,{\y}) circle ({\r});
+								\node at (\x,{\y}) { $\cec{w}_{n,\j}$};
+								\draw [->] ({\x+\r},{\y})--({\x+\r+0.3},{\y});
+								\def\xx{\x+\r+0.3}
+								% \draw[fill=white] ({\x-\r},{\y-\r})--({\x+\r},{\y-\r})--({\x+\r},{\y+\r})--({\x-\r},{\y+\r})--cycle;
+								\node[anchor=west] at (\xx,{\y}) {\fontsize{1}{0}\selectfont$\phi_{n}(y_{n}^{\j})$};
+							}
+							\draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+							\node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+						\end{tikzpicture}
+						
+						\end{center}\caption{An activated MLP where the activation function is computed with the node, as a scalar function $\phi_i(x)$.}\label{F:SepAct}
+					\end{figure*}
+
+				\subsection{Non-Separable Activation Functions}
+
+					Although per-node activation functions were biologically motivated by comparison with neurons, it is not necessary to consider them an inherent property of the nodes themselves. 
+
+					In fact, it is often useful to consider more general functions $\mathcal{F}$, where it is proper to think of them as happening as part of the \textit{layer}: the nodes compute $y_i$ which the layer then gathers into $\vec{y}$ and the operation can only be performed once $\vec{y}$ is fully specified. 
+
+					An example of a commonly used non-separable layer-activation function is the `Softmax' function:
+					\begin{equation}
+						\text{softmax}(\vec{x}) = \frac{1}{\sum_i \exp(x_i)} \begin{pmatrix}
+							\exp(x_0) \\ \exp(x_1) \\ \exp(x_2) \\ \vdots
+						\end{pmatrix}
+					\end{equation}
+					This function is used to convert arbitrary vectors $\vec{x}$ into meaningful probability mass arrays: the elements of $\vec{y} = \text{softmax}(\vec{x})$ sum to one and are all between 0 and 1. This layer is often used as the output for one-hot-encoding classifiers, as well as statistically motivated tasks. 
+
+					It is not possible to compute this function on the nodes (without a complex series of nodes-connected-to-nodes-in-their-own-layer, which gets tiresome), because you cannot perform the division without knowing the state of all of the other nodes in the layer.
+
+					Other common non-separable functions include the various pooling and max-ing layers common in CNNs. 
+
+					For our current purposes, it suffices merely to note that, \textit{in general} the function $\mathcal{F}$ is a per-layer function of arbitrary complexity. However, for the majority of practical purposes it is easiest to use per-node scalar activation functions.
+
+				\subsection{The Proof is in the Pudding}
+
+				\begin{figure*}
+					\newcommand\image[1]
+					{
+						\includegraphics[width=0.4\linewidth,keepaspectratio=true]{../Presentation/Images/#1}
+					}
+					\begin{tabular}{cc}
+						\image{nonlinear_1} & \image{nonlinear_2} \\ \image{nonlinear_3} & \image{nonlinear_4}
+					\end{tabular}
+					\caption{As in Fig. \ref{F:Linear}, but using Sigmoid activation functions instead of linear. The resulting curved lines demonstrate the effectiveness of the method.}\label{F:NonLinear}
+				\end{figure*}
+					We now implement a common activation function, the Sigmoid (also known as logit)
+					\begin{equation}
+						\sigma(x) = \frac{1}{1 + \exp(-x)}
+					\end{equation}
+					This starts at $\sigma = 0$ at $x \ll 0$, and then increases up to $\sigma = 1$ at $x \gg 0$ with a period of linearity around $x \approx 0$. 
+
+					The results of a randomly initialised (5-3-1) function with Sigmoid activation on the hidden layers and a Perceptron classifier on the final layer are shown in Fig. \ref{F:NonLinear}. Unlike the plots of the identical network with linear activation functions (Fig. \ref{F:Linear}) we see that our straight classification boundaries have been replaced by appropriately non-linear ones: we are ready to begin machine learning in earnest!
+					
+				\subsection{In Defence of Linear Activation Functions}
+
+					It is tempting to think, given all that we have discovered, that the linear activation function $\mathcal{F}(\vec{x}) = \vec{x}$ will never see the light of day.
+
+					This is in fact wildly incorrect. 
+
+					Almost all\footnote{In the \href{https://en.wikipedia.org/wiki/Almost_all}{mathematical sense}, since the space of classification functions is of a lower cardinality than the space of even arbitrary scalar functions, let alone arbitrary functions on $\mathbb{R}^n$.} neural networks have a linear activation function as their final layer. 
+
+					This is because neural networks can be used to approximate \textit{any} function, not just perform classification. If the value of this function is unbounded (i.e. it's not a probability you know should be $0\leq p \leq 1$), then the linear activation function is needed. So long as you have non-linear activation functions within the hidden layers, the output layer being non-linear is of no consequence. 
+
+					I wrote this section after I saw online\footnote{It was reddit. Of course it was reddit} some people arguing that the linear activation function `should never have been coded', which is, of course, dumb.
+
+
+			\section{Universal Approximation}
+
+				One of the most important properties about a FNN in the way that we have constructed them is that they are \textbf{Universal Approximators}: they are able to model arbitrary functions.
+
+				The Cybenko statement is as follows:
+
+				{\centering \it A FNN with a single hidden layer of infinite width and possessing the Sigmoid activation function can approximate any function}.
+
+				This argument has since been generalised to networks of arbitrary depth, non-sigmoid activation functions, and non-infinite networks. 
+
+				In short: for any conceivable function $f: \mathbb{R}^n \to \mathbb{R}^m$ there is \textit{some} neural network architecture which can replicate it. It does not matter how complex the function is, or what might need to be done to compute it `properly': a FNN of sufficient size can compute it.
+
+				The catch, naturally is twofold:
+				\begin{itemize}
+					\item There is very little information (\textit{a priori}) about what `sufficient size' is.
+					\item These proofs are non-constructive: they tell you a network exists, but give no indication on how to go about constructing it.
+				\end{itemize}
+
+				In short: we know that, for every single problem, there exists an FNN which can solve it. But how to go about making that network, or how many trillions of nodes it might need, is left as an exercise to the reader. 
+
+				The difficulty is not the theory, it's in the execution.
+
+				
+				
+
+		\chapter{Training an MLP}
+
+			Training an MLP is a fiddly business: the mathematics is actually rather simple (it is merely a recurrence relation on the chain rule) -- the difficulty is merely one of ensuring all the right parts end up in the right places. 
+
+			\section{Setting the Scene}
+				The first thing we have to realise is that the simple formula of the Perceptron update formula will no longer work. We will need to tackle this as an \textit{optimisation problem}. We therefore move away from a binary `yes/no' output and into a continuous output.
+
+				In the case of a single-variable classifier, we might use a sigmoid as our final layer neuron (or, in the case of one-hot encoding, a series of them). If we are instead focusing on approximating an arbitrary function, then a linear activation function will suffice. 
+
+				Whichever way we look at it, the output of our network is now a continuous vector $\vec{x}$. We might choose to post-process this into a binary answer (i.e. a classification probability $>0.5$ can be converted into a `yes' and $<0.5$ into a no), but the network itself will utilise continuous outputs. 
+
+				With a continuous output, we can then assign a \textit{cost function}, $C(\vec{x}_\text{output})$. This cost function (also known as a loss function) should be a differentiable function of the prediction value and, as such, is a function of the current network state. 
+
+				A well-behaved cost function $C(\vec{x})$ has the following behaviours:
+				\begin{enumerate}
+					\item $\pdiv{C}{\vec{x}}$ exists and is computable. 
+					\item $C(\vec{x})$ is small when the network prediction is close to the `ground truth', $\vec{y}_\text{truth}$. We may write $C = C(\vec{x} | \vec{y})$
+					\item It is large when the prediction is far away.   
+				\end{enumerate}
+
+				In this sense, $C$ measures the overall performance of the network. The following score can be assigned to a `training set' of data $(\vec{d}_i)$ where the expected output of the network is known $(\vec{y}_i)$ is known:
+				\begin{equation}
+					\mathcal{L} = \sum_{\text{data $q$ in set}} C\left( \mathcal{P}(\vec{d}_q | \vec{y}_q) \right)
+				\end{equation}
+				This function, $\mathcal{L}$ is a function therefore of the training set and of the state of the network, which is determined by the weights:
+				\begin{equation}
+					\mathcal{L} = \mathcal{L}\left(\{ \vec{w} \}\right)
+				\end{equation}
+
+				The task of training the network is therefore equivalent to finding the set of $\{\vec{w}\}$ which minimise the value of $\mathcal{L}$. If we can find these values, we have found the network configuration which best approximates our input function. 
+
+				We recall that the optima of a function are found whenever the derivatives are zero. If $\vec{w}_\ell^i$ is the weights associated with the $i^\text{th}$ node in the $\ell^\text{th}$ layer, then we need to find the point where:
+				\begin{equation}
+					\pdiv{\mathcal{L}}{\vec{w}_\ell^i} = 0
+				\end{equation}
+				We must then simultaneously solve this equation for every node in the set. \textbf{This is not analytically possible}. We must therefore resort to the methods of numerical solutions to differential equations, as discussed in Chapter \ref{C:Optimisation}.
+
+				In the case of Newton's gradient descent, for instance, we simply need to be able to iterate over the following equation:
+				\begin{spalign}
+					\vec{w}_\ell^i \to \vec{w}_\ell^i - \frac{\alpha}{|\vec{d}_\ell^i|}\vec{d}_\ell^i
+					\\
+					\vec{d}_\ell^i = \pdiv{\mathcal{L}}{\vec{w}_\ell^i}
+				\end{spalign}
+				The negative sign here is because we are trying to \textit{minimise} our cost function. We could define our cost function to be `large when good' and `small when bad', in which case we would use a $+$ and be maximising. 
+
+				Our goal is now clear: we must find a way to compute these gradients.
+				
+				This will be a gross task, but the end result is surprisingly tractable.
+
+
+			\section{Notational Clarification}
+
+				The complexity in this task is one of notation and exploding dimensionality. For that reason, it is important to make sure we are clear about our notation. We recall the distinction between $\vec{x}$, $\cec{x}$ and $\vec{y}$:
+
+
+				\begin{equation}
+					{y}_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} ~~~~~ \vec{y}_i = \begin{pmatrix}
+						y_i^1 \\ y_i^2 \\ y_i^3 \\ y_i^4 \\ \vdots 
+					\end{pmatrix}~~~~~~\Longleftrightarrow~~~\vec{y}_i = W_i \cec{x}_{i-1}
+				\end{equation}
+				That is, ${y}_i^j$ is the \textit{unactivated result} which comes out of node $j$ in layer $i$, and which can be packaged into the vector $\vec{y}_i$; the \textit{unactivated vector} associated with layer $i$.
+
+			Each layer\footnote{Recall that, properly speaking, it is the layer which does the activation. The nodes only do it in the case of simple separable functions} then performs an activation transformation, and we then augment the vector into a higher-dimension (to incorporate the bias):
+			\begin{equation}
+				\vec{x}_i = \mathcal{A}_i(\vec{y}_i) ~~~~~~~ \tilde{\vec{x}}_i = \begin{bmatrix} 1 \\\mathcal{A}_i(\vec{y}_i)\end{bmatrix}
+			\end{equation}
+			If this is a separable transform, then it can be written as:
+			\begin{equation}
+				\tilde{\vec{x}_i} = \begin{pmatrix}
+					1 \\ a_i\left( y_i^1\right) \\ a_i\left( y_i^2\right) \\ a_i\left( y_i^3\right)\\ a_i\left( y_i^4\right) \\ \vdots 
+				\end{pmatrix}
+			\end{equation}
+			
+			The problem is therefore simple enough to state. The issue is that our cost function is a horrible series of these functions. Taking the derivative is going to be wildly unpleasant. 
+		% 	\begin{float}
+		% 	For a simple 3-layer network, the problem looks like this:
+			\newcommand\afunc[2]
+			{
+				\mathcal{A}_{#1}\left(\begin{matrix}\vec{w}^1_{#1} \cdot#2 \\ \vec{w}^2_{#1} \cdot#2 \\  \vec{w}^3_{#1} \cdot#2  \\ \vdots \end{matrix} \right)
+			}
+		% 	\begin{equation}
+		% 		\mathcal{P}(\vec{d}_\text{input}) =  \afunc{3}{\afunc{2}{{\afunc{1}{\vec{d}_\text{input}}}}}
+		% 	\end{equation}
+		% \end{float}
+
+
+
+		\section{The Cost Function}
+
+
+			The Cost function associated with the network is something which is \textbf{minimised} at when the network is performing well, and \textbf{minimised} when it is performing badly. 
+
+			It will be significantly easier (but not actually a requirement) if our cost function is linear in the data, that is, it can be written as:
+			\begin{equation}
+				\mathcal{L}(\{\vec{d}\}) = \sum_q C(\vec{d}) ~~~~\Longleftrightarrow \pdiv{\mathcal{L}}{\vec{w}} = \sum_q \pdiv{C_q}{\vec{w}}
+			\end{equation}
+			If we can find the derivative as a function of a single input data, then we simply need to sum the derivatives over all the input data, and we're good to go. 
+			
+			We will assume that all of our cost functions will take this form, and so $\pdiv{C}{\vec{w}}$ is our primary goal.
+
+
+			A decent first guess at the cost function would be the least squares function:
+			\begin{spalign}
+				C(\vec{d}|\vec{\ell}) & = \left(\mathcal{P}(\vec{d}) - \vec{\ell}\right)^2  
+				\\
+				& = \left(\mathcal{P}(\vec{d}) - \vec{\ell}\right) \cdot \left(\mathcal{P}(\vec{d})- \vec{\ell}\right)
+			\end{spalign}
+			Here $\mathcal{P}$ is the output of our network (the final output vector), and $\vec{\ell}$ is the label of that data. If our network outputs a scalar, then $\vec{\ell} \to \ell$ and we lose the dot product.
+
+	
+			Other cost functions are possible. One popular one is (motivated by statistics) to assume a one-hot encoding, where $\vec{\ell} = (0,0,\hdots,1,\hdots,0)$ is a vector of zeros, except at the index associated with its classification. This lends itself to a `cross entropy' cost function which is (if the output vector is interpreted as a probability) merely the log-posterior of the predictor:
+			\begin{equation}
+				C(\vec{d}|\vec{\ell}) = \sum_i \ell_i \log(p_i)~~~~~~ p_i = \left[ \mathcal{P}(\vec{d}) \right]_i
+			\end{equation} 
+			When writing this, one has to make special note that $0 \times \log(0) = 0$, because otherwise your computer will cry.
+
+		\section{Backpropagation}
+
+			To compute the set of gradients $\left\{\pdiv{C}{\vec{w}_i^j} \right\}$ will, in general, require manual computation of every single one of these multidimensional derivatives.
+
+			Luckily, there is an easier way. 
+
+			The single most important equation we will be using is this chain rule equation, which notes that:
+			\begin{spalign}
+				\pdiv{C_i}{\vec{w}_i^j} & = \pdiv{C_i}{y_i^j} \pdiv{y_i^j}{\vec{w}_i^j} 
+				\\
+				& \left( \text{recall } y_i^j = \vec{w}_i^j \cdot \tilde{\vec{x}}_{i-1} \right)
+				\\
+				& = \pdiv{C_i}{y_i^j} \tilde{\vec{x}}_{i-1}
+			\end{spalign}
+			\textbf{This is why I suggested the route of augmenting vectors rather than adding the bias manually -- it makes your gradients trivially easy to compute as a whole, rather than having to do the bias separately!}
+
+
+			\subsection{The Output Layer}
+
+				The output layer is the easiest to compute gradients for, because they do not have a knockon effect on the rest of the network in the way that the hidden layers do.
+
+					We recall that, by definition, $\mathcal{P} = \mathcal{A}(\vec{y_{N}})$, so we merely need to compute
+				\begin{spalign}
+					\pdiv{C_q}{y_N^i} & = \pdiv{C_q}{p_i} \times \pdiv{C_q}{y_N^i}
+					\\
+					& = \pdiv{C_q}{p_i} \pdiv{}{y_N^i} a(y_N^i)
+				\end{spalign}
+			We assume that (since we chose it) if $a_N(x)$ is the activation function of the $N^\text{th}$ layer, then we know that $d_N(x) = \pdiv{a_N}{x}$ is its derivative. We can then write:
+			\begin{spalign}
+				\pdiv{C_q}{y_N^i} & = \pdiv{C_q}{p_i} \times d_N(y_N^i)
+			\end{spalign}
+
+			This means that:
+			\begin{spalign}
+				\pdiv{C_q}{\vec{w}_\ell^i} = d_N(y_N^i)\pdiv{C_q}{p_i} \cec{x}_{N-1}
+			\end{spalign}
+
+			If we use the least squares cost function, then:
+			\begin{spalign}
+				\pdiv{C_q}{\vec{w}_\ell^i} = d_N(y_N^i) \times \left( p_q^i - \ell_q^i\right) \cec{x}_{N-1}
+			\end{spalign}
+
+
+				
+			This is easy to compute \& calculate. It is the product of the activation function's derivative (something we should write when we write the node's activation function itself), the difference between the $i^\text{th}$ element of the prediction vector, $p_q^i$ and it's associated `true label' $\ell_q^i$, and the output of the lower layer vector, $\cec{x}$. 
+			
+			
+			One layer down, an unknown number to go....
+
+			\subsection{The Hidden Layers}
+			The next layer, down, however, can be trivially computed from the chain rule. Since the output from layer $p$, $\vec{y}_p$ is only directly used by the layer $p+1$, we can write:
+			\begin{equation}
+				\pdiv{C_q}{y_p^i} = \sum_{\text{nodes $j$ in $p+1$ layer}} \pdiv{y_{p+1}^j}{y_p^i} \pdiv{C_q}{y_{p+1}^j}
+			\end{equation}
+			That is, the derivative with respect to the $y$ in layer $p$ is equal to (the sum of) the way in which $y_{p+1}$ affects $C_q$, multiplied by the way in which $y_p$ affects $y_{p+1}$. 
+
+			This seems relatively horrible to write out in mathematics, but we're almost there. 
+
+			The final step is to write $\pdiv{y_{p+1}}{y_p}$ in terms of known variables. We recall that:
+			\begin{equation}
+				y^j_{p+1} = \vec{w}_{p+1}^j \cdot \begin{bmatrix} 1 \\ a_{p+1}(y_p^1) \\ a_{p+1}(y_p^2) \\ \vdots \end{bmatrix}
+			\end{equation}
+			Therefore:
+			\begin{spalign}
+				\pdiv{y^j_{p+1}}{y_p^i} &= \left[ \vec{w}_{p+1}^j \right]_{i+1} \div{}{y_{p}^j} a_{p+1}(y_p^i)
+				\\
+				& = \left[ \vec{w}_{p+1}^j \right]_{i+1} d_{p+1}(y_p^i)
+			\end{spalign}
+			\textbf{Note that the index of $[\vec{w}]$ is offset by one: $i+1$ not $i$. This is because of the bias term which sits at the first index of $\vec{w}$.}
+
+			
+			\subsection{Putting it All Together}
+
+				This is a lot of maths. The upside is that it is relatively trivial to actually \textit{implement} within the neural network. 
+
+				In order to compute the gradients, we have:
+				\begin{equation}
+					\pdiv{C_q}{y_\ell^i} = \begin{cases} \pdiv{C_q}{P_q^i} \times d_N(y_N^i) & \text{ if $\ell = N-1$}
+					\\
+					d_\ell(y_\ell^i) \sum_{j}  \left[ \vec{w}_{\ell+1}^j \right]_{i+1} \pdiv{C_q}{y_{\ell+1}^j}
+					
+					\end{cases}
+				\end{equation}
+				Where $\pdiv{C_q}{P_q^i}$ is the derivative of your chosen cost function, and $d_N(y)$ is the derivative of the $N^\text{th}$ layer's activation function. Having computed all of these values, it is therefore trivial to find:
+				\begin{equation}
+					\pdiv{C_q}{\vec{w}_\ell^i} = \pdiv{C_q}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
+				\end{equation}
+
+			\subsubsection{What the hell just happened?}
+				This seems imposing, so it is worth reiterating what is happening.
+				\begin{itemize}
+					\item We first start by passing the information \textit{forward} through the network, in order to compute our values of $\vec{y}$, and $\tilde{\vec{x}}$ since we need these to compute the gradients.
+					\item We then move to the back of the network by first computing how the score changes if the prediction changes. This is $\pdiv{C_q}{P_q^i}$: it tells us how the score $(C)$ of the $q^\text{th}$ datapoint changes when we tweak the value of $P$, the prediction. 
+					\item The final layer of the network (the one which makes $P$) then uses this information to work out how $P$ changes when it tweaks its unactivated values, $\vec{y}$. It then uses this to work out how the score $C$ changes when $y$ is tweaked: this is $\pdiv{C}{y_N}$. 
+					\item Th next layer down then works out how much $\vec{y}_N$ changes when the layer $N-1$ tweaks \textit{it's} unactivated values. The rate at which $C$ changes in response is just the product of the higher layer's gradients times these internal tweak values, giving us $\pdiv{C}{y_{N-1}}$
+					\item Then we repeat through the network, each time using the upper layer's gradient to compute the gradient of the next layer. 
+					\item When we reach the first layer, we are almost done.
+					\item We then go back through the network and use $\pdiv{C}{y}$ to compute $\pdiv{\mathcal{L}}{\vec{w}}$ -- this is a simple multiplication!
+				\end{itemize}
 			
 \end{document}
