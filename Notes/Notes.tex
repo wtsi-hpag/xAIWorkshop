@@ -2097,11 +2097,7 @@
 			Here $\mathcal{P}$ is the output of our network (the final output vector), and $\vec{\ell}$ is the label of that data. If our network outputs a scalar, then $\vec{\ell} \to \ell$ and we lose the dot product.
 
 	
-			Other cost functions are possible. One popular one is (motivated by statistics) to assume a one-hot encoding, where $\vec{\ell} = (0,0,\hdots,1,\hdots,0)$ is a vector of zeros, except at the index associated with its classification. This lends itself to a `cross entropy' cost function which is (if the output vector is interpreted as a probability) merely the log-posterior of the predictor:
-			\begin{equation}
-				C(\vec{d}|\vec{\ell}) = \sum_i \ell_i \log(p_i)~~~~~~ p_i = \left[ \mathcal{P}(\vec{d}) \right]_i
-			\end{equation} 
-			When writing this, one has to make special note that $0 \times \log(0) = 0$, because otherwise your computer will cry.
+			Other cost functions are possible -- and are discussed in detail in section \ref{S:CostFuncs}
 
 		\section{Backpropagation}
 
@@ -2191,16 +2187,172 @@
 					\pdiv{C_q}{\vec{w}_\ell^i} = \pdiv{C_q}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
 				\end{equation}
 
-			\subsubsection{What the hell just happened?}
+			\subsubsection{What on Earth just happened?}
 				This seems imposing, so it is worth reiterating what is happening.
 				\begin{itemize}
 					\item We first start by passing the information \textit{forward} through the network, in order to compute our values of $\vec{y}$, and $\tilde{\vec{x}}$ since we need these to compute the gradients.
 					\item We then move to the back of the network by first computing how the score changes if the prediction changes. This is $\pdiv{C_q}{P_q^i}$: it tells us how the score $(C)$ of the $q^\text{th}$ datapoint changes when we tweak the value of $P$, the prediction. 
 					\item The final layer of the network (the one which makes $P$) then uses this information to work out how $P$ changes when it tweaks its unactivated values, $\vec{y}$. It then uses this to work out how the score $C$ changes when $y$ is tweaked: this is $\pdiv{C}{y_N}$. 
-					\item Th next layer down then works out how much $\vec{y}_N$ changes when the layer $N-1$ tweaks \textit{it's} unactivated values. The rate at which $C$ changes in response is just the product of the higher layer's gradients times these internal tweak values, giving us $\pdiv{C}{y_{N-1}}$
+					\item Th next layer down then works out how much $\vec{y}_N$ changes when the layer $N-1$ tweaks \textit{its} unactivated values. The rate at which $C$ changes in response is just the product of the higher layer's gradients times these internal tweak values, giving us $\pdiv{C}{y_{N-1}}$
 					\item Then we repeat through the network, each time using the upper layer's gradient to compute the gradient of the next layer. 
 					\item When we reach the first layer, we are almost done.
 					\item We then go back through the network and use $\pdiv{C}{y}$ to compute $\pdiv{\mathcal{L}}{\vec{w}}$ -- this is a simple multiplication!
 				\end{itemize}
+		\chapter{Training Considerations}
+
+			I won't spend too much time talking about things here because entire tomes have been written about them elsewhere, this will be a brief overview of some major themes.
+
+
+			\section{Modified Cost Functions}\label{S:CostFuncs}
+
+				The choice of Cost (or Loss) function is an important one, because it specifies the kinds of behaviours that you wish to encourage in the model, and -- perhaps most importantly -- the kinds of scales of errors that you are willing to tolerate. 
+
+				For example, the least squares error does a decent enough job for fitting functions, but if your prediction value is to be interpreted as a probability, then it exhibits some undesirable behaviour. 
+				
+				Consider the case where a value in your training set \textit{should} have a predicted probability of 0.25: the last squares assigns the same penalty to prediction of 0.001 as it does to a prediction of 0.5001.
+
+				However, in the realm of probability, 0.25 and 0.5 are rather `close' -- they both describe an event which is plausible; whereas 0.001 describes an event which is (almost) impossible. Although the absolute difference in probabilities is the same, the meaning behind these is very different. As a statistician I am not (particularly) worried if my model regularly predicts something as being 10\% more common than it should be: I \textit{am} worried if it regularly predicts that something common is in fact highly implausible.
+
+				My model should react far more strongly to a $0.25 \to 0.001$ error than it should to a $0.25 \to 0.5$ error, and the least squares method simply does not do that!
+
+				If we wish to encourage the model to consider the scale as important, then a cost function on the Logarithms is more appropriate. If we go back to an true/false labelled dataset, then:
+				\begin{equation}
+					C = \begin{cases} \log(\mathcal{P}(\vec{d})) & \ell = 1
+						\\
+						\log(1 - \mathcal{P}(\vec{d})) & \ell = 0
+					\end{cases} ~~~~~~~~\text{and} ~~~~~~ \pdiv{C}{\mathcal{P}} = \begin{cases} \frac{1}{\mathcal{{P}}} & \ell = 1
+						\\
+						\frac{-1}{1 - \mathcal{P}} & \ell = 0\end{cases}
+				\end{equation}
+
+
+				One popular one is (motivated by statistics) to assume a one-hot encoding, where $\vec{\ell} = (0,0,\hdots,1,\hdots,0)$ is a vector of zeros, except at the index associated with its classification. This lends itself to a `cross entropy' cost function which is (if the output vector is interpreted as a probability) merely the log-posterior of the predictor:
+				\begin{equation}
+					C(\vec{d}|\vec{\ell}) = \sum_i \ell_i \log(p_i)~~~~~~ p_i = \left[ \mathcal{P}(\vec{d}) \right]_i
+				\end{equation} 
+				When writing this, one has to make special note that $0 \times \log(0) = 0$, because otherwise your computer will cry.
+
+			\section{Degradation \& Convergence}
+
+				It seems intuitive that simply shouting `MORE!' and adding more, bigger layers into a network will improve the accuracy of the prediction. After all, the Universality Theorems state that, with sufficient size, we can model any function. 
+
+				Why don't I want to make my model as large as possible?
+
+				Intuitively it would seem that this could \textit{only} make our results better. Empirically, however, it becomes obvious that this does not result in the desired improvements -- in fact, making networks \textit{larger} often makes them \textit{worse}.
+				
+				There are two slightly different ways to understand this counterintuitive result, which is known as the Degradation Problem.
+
+				\subsection{Convergence, Gradients}
+
+					A fundamental problem of numerical optimisation is that it is never possible to prove that any given location is a global maximum; and (even worse), given the finite resolution of numerical methods, it is actually impossible to prove that a given location is even an optimum, and not just an area of non-zero-but-below-computational-$\epsilon$-gradient.
+
+					Simply put: you never know if your model has converged, and even if you did, you never know if your model has found a global solution. 
+
+					These problems exist in all numerical optimisation problems (where it is often sufficient to get `close enough'). The problem with Neural Networks is that as you add layers, you also increase the dimensionality of the optimisation space. 
+
+					This induces two problems; it increase the (potential) number of local optima\footnote{And recall, we \textit{know} there are multiple global optima which produce the same output, since there are multiple functions which produce the same output over the training set data -- this does not even account for the number of local optima!}, but also makes us susceptible to the Vanishing Gradients Problem. 
+
+					In a network of sigmoids where the gradient is bounded between $[-1,1]$, the tendency of the chain rule is to cause the gradient to decrease the deeper into the model one goes; and when the model gets sufficiently large, the gradient becomes so small that the optimiser is unable to move the parameters. An opposite problem -- the Exploding Gradients Problem -- can also happen, in which case the optimiser moves, but in a chaotic, haphazard fashion which can cause overflows and numerical instability. 
+
+				\subsection{The Identity Problem}
+
+					Consider a network of $N$ layers, which functions perfectly, mapping input $\vec{x}$ to output $\vec{y}$. We now add this network as the `head' of a larger model with $M$ layers. 
+
+					It would seem, intuitively, that this network should still be able to work perfectly since all the $M$-layer network needs to do is perform the mapping $\vec{x} \to \vec{x}$ and the perfect $N$-layer network will function as expected. 
+
+					The problem, as it turns out, is that this mapping (the identity mapping) is actually really quite difficult for a neural network to do. 
+
+					The issue is rather simple. This is a linear operation -- the simplest possible linear operation, in fact.
+
+					\textbf{But we went to quite some effort to grant our Neural Networks non-linear properties.}
+					
+					Our construction of Neural Networks was designed in such a way as to make this incredibly simple operation surprisingly difficult. 
+
+					Therefore, adding layers past the point of `being enough' can actually lead to a degradation in performance, unless you go to efforts to construct your network to permit linear operations in certain cases -- ResNets are an example where the input vector $\vec{x}$ gets passed through the network on `free connections'. The intermediary layers are therefore modelling the function $f(x) - x$. If the model thinks that $\vec{x}$ is better than a non-linear mapping then it can just set $\vec{w} = 0$ (for a ReLu network), such that $f(x) -x = 0 \to f(x) = x$.
+
+
+					These `highway paths' are an integral part of modern architectures such as Transformers and enable networks to grow much larger than a na\"ive FNN can plausibly permit.
+
+
+
+			\section{Interpolation}
+
+				The Universality theorem -- which, to recap, guarantees that a FNN of sufficient size is able to model any possible function -- is brilliant, and is what enables modern Machine Learning as a field of study. 
+
+				However, it has one major, major downside: the value of the optimal set of weights, $\{\vec{w}\}$ is conditioned on the input data. 
+
+				That is, you do not actually train your network on a function (which usually has an infinite continuum of input and output values), but on a finite sample of points. The Universality Theorem does not guarantee that the network will fit \textbf{the} function which provides your sample, but \textbf{any} function which is capable of producing those same outputs. 
+
+				For example, consider a network which is trained to predict function values based on some sample points. For the given input data, the Universality Theorem talls us absolutely nothing about which function a Neural Network will prefer -- even if one seems more evidently `correct' than the other to us. 
+
+				\begin{center}
+					\begin{tikzpicture}
+					
+					\begin{axis}[xmin = -5, xmax = 5, ymin = -5, ymax = 5, ylabel={$y$ }, xlabel ={$x$},x post scale = 1]
+									\addplot[domain = -5:5, samples = 200,blue]{x};
+									\addplot[domain = -5:5, samples = 200,red]{0.06666 * x^4 - 0.2*x^3 - x^2 + 2.2666*x +2};
+									\addplot[domain = -5:5, samples = 200,green]{2.0 + 3.06*x^1 - 0.499*x^2 - 0.596*x^3 - 0.0125*x^4 + 0.0264*x^5};
+									% \addplot[domain = -5:5, samples = 200,blue]{2.0 + 3.53*x^1 -1 0.356*x^2 -1 0.933*x^3 + 0.0191*x^4 + 0.058*x^5 -1 0.00527*x^6};
+									% \addplot[domain = 0:2, samples = 200,blue]{1-x};
+
+									\addplot+[const plot, no marks, orange] coordinates {(-5,4)  (-3.6,-3) (-2.5,-5) (-1.5,-1) (0,-3.8) (1,2) (3,-2) (4.5,5)};
+
+
+									 \addplot[mark=*, red] coordinates {(-1,-1)};
+									 \addplot[mark=*, red] coordinates {(-3,-3)};
+									 \addplot[mark=*, red] coordinates {(2,2)};
+									 \addplot[mark=*, red] coordinates {(5,5)};
+									%  \addplot[domain = -1:1, samples=2, orange, ultra thick]{0};
+									%  \addplot[mark=*, orange] coordinates {(0,0)};
+								\end{axis}
+					
+					\end{tikzpicture}
+					\end{center}
+
+					All of these functions predict with 100\% accuracy the value of the provided training points, but give wildly divergent values when we ask for predictions outside the training set.
+
+					In short, we are making the same assessment that we make whenever we perform regression and interpolation: we hope that our knowledge of the behaviour at certain points will provide insight into the behaviour of the model \textit{in the spaces between points}.
+
+					This is by no means guaranteed: there are an infinite number of functions $f$ which provide a finite output set $\{ \vec{d} \}$ and whislt that's great (it's the entire basis of approximation theory!), it also means we have to be careful when making judgement calls about the behaviour of the function we observe being output from our neural network: it is only an approximation to the true function. 
+
+					Trying to draw firm conclusions about $f$ from an approximation $\tilde{f} \approx f$ is a fraught endeavour and one you must be careful with.
+
+					I loosely term this problem ``The Interpolation Problem''.
+
+			\section{Overfitting \& Regularisation}
+
+				The `Interpolation Problem' has a related cousin (and one that receives an awful lot more attention), namely that the following function is \textit{also} in the set of functions which produce the provided dataset:
+
+				\begin{equation}
+					\mathcal{P}(\vec{d}_i) = \ell_i
+				\end{equation}
+
+				That is, the function which outputs the label $\ell_i$ when given the datapoint $\vec{d}_i$ is an entirely valid function, and (by definition) it is also one of the infinite number of functions which minimise the Cost Function. 
+
+				It is, also, the classic case of Overfitting. The model has learned absolutely nothing about `intrinsic behaviours', or `internal representations' and has merely learned to isolate the input data and assign it the datapoint it was supposed to. 
+
+				It is the difference between a schoolchild who has learned how to perform mental maths, and one who has learned to reflexively blurt out their multiplication tables: one will be able to generalise their knowledge to new areas, the other will be stumped as soon as you ask them what $2.5 \times 3$ is, since they only know $2\times3$ and $3 \times 3$.
+
+				There are various ways to get around this, and I won't get into too many of them here. The split between test/validation data is an easy way to detect if this is occuring (if the model converges to 100\% accuracy on the training data, but poorly on the validation data, it has overfitted), but only provides a warning system: it doesn't actually help \textit{prevent} overfitting. 
+
+				Perhaps the most common and mathematically rigorous means of preventing overfitting is to implement a Regularisation method; or (in the terminology of Bayesian statistics) a prior function. 
+
+				In this case we modify our cost function to be something along the lines of:
+				\begin{equation}
+					\mathcal{L} = \sum_q C(\vec{d}_q | \vec{\ell_q}) + R(\{\vec{w}\})
+				\end{equation}
+				Where $R$ is a Regularisation function. A common form of Regularisation is the $\ell_2$-norm regulariser:
+				\begin{equation}
+					R = - \sum_{\ell} \sum_i \alpha |\vec{w}_\ell^i|^2
+				\end{equation}
+				This value is large (i.e. close to zero) when the $\vec{w}$ are small, and small (i.e. far from zero) when $\vec{w}$ are large. The model will then preferentially choose, all else being equal, parameters where $\vec{w}$ is small.
+
+				This form of Regularisation is easy to handle, because it requires only minor modifications to our backpropagation:
+				\begin{equation}
+					\pdiv{\mathcal{C}}{\vec{w}_\ell^i} \to  \pdiv{\mathcal{C}}{y_\ell^i} \cec{x}_{\ell-1} - \alpha \vec{w}_\ell^i
+				\end{equation}
+				The problem is that the `regularising strength', $\alpha$ is a free parameter which, by definition, makes the fit worse because we want to prevent the model from fitting perfectly. Choosing the correct $\alpha$ is a difficult task, and one that cannot readily be automated. 
+
+			
 			
 \end{document}
