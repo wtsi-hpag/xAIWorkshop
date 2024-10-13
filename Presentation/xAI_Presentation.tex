@@ -18,28 +18,140 @@
 
 \renewcommand\vec[1]{\boldsymbol{\mathbf{#1}}}
 \begin{document}
+
+	\begin{frame}[fragile]{Today's Resources}
+		
+		{\large 
+		\textbf{Access the Notebook:} 
+		\begin{itemize}
+			\item Local Clone (\textbf{Recommended}) \verb|git clone https://github.com/wtsi-hpag/xAIWorkshop|
+			\item Online Hosting (\textbf{Slow}) Visit \verb|https://githubtocolab.com/wtsi-hpag/xAIWorkshop|
+		\end{itemize}
+	
+		\vspace{1cm}
+
+		\textbf{Interactive Questions} 
+		
+		(Keep open in a browser tab!)
+
+		\begin{center}
+			Join \verb|menti.com| with code \verb|2834 2684|
+		\end{center}
+		}
+	\end{frame}
+
 	\maketitlepage
 
+	{\setbeamercolor{background canvas}{bg=black}
+	
+	\definecolor{computer}{RGB}{102,255,102}
+		\nologo{}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\pause\verb|    >> import ml_toolbox|\par\par
+			\pause \verb|    >> data,labels = load_my_data()|\par\par
+			\pause \verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\pause \verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\pause\verb@    Epoch 0: 0%|                | [0/1000 10it/s, loss = 10.4]@\par~\par
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
 
-	\begin{frame}{Why bother?}
-
-		In a world with dozens of pre-built ML tools....why bother studying the fundamentals?
-
-		\pause In a word...
-		\pause\begin{center}
-			\LARGE FOLKLORE
-		\end{center}
-		% \pause Might get you where you need to go...but often leads you astray
-	\end{frame}
-	\begin{frame}{ML Folklore}
-		\begin{itemize}
-			\pitem ADAM vs AdaGrad?
-			\pitem Softplus vs ReLu vs Leaky ReLu vs Sigmoid?
-			\pitem Cross-Entropy vs Least Squares?
-			\pitem Validation set magic numbers
-			\pitem (Explainability!) 
-		\end{itemize}
-	\end{frame}
+			~
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 100: 10%|xx              | [100/1000 10it/s, loss = 5.5]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 200: 20%|xxxx            | [200/1000 12it/s, loss = 3.4]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 300: 30%|xxxxxx          | [300/1000 9it/s, loss = 3.1]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 400: 40%|xxxxxx          | [400/1000 16it/s, loss = 2.9]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 500: 50%|xxxxxxxxx       | [500/1000 12it/s, loss = 1.4]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 700: 70%|xxxxxxxxxxxx    | [700/1000 5it/s, loss = 1.39]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 900: 90%|xxxxxxxxxxxxxxx | [900/1000 8it/s, loss = 1.385]@\par~\par~
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			}
+		\end{frame}
+		\begin{frame}[fragile]{\color{computer}Seem Familiar?}
+			
+			{\color{computer}
+			\verb|    >> import ml_toolbox|\par\par
+			\verb|    >> data,labels = load_my_data()|\par\par
+			\verb|    >> model = ml_toolbox.make_model(layers=5,func=sigmoid)|\par\par
+			\verb|    >> model.Train(data,labels,epochs=1000)|\par~\par
+			\verb@    Epoch 1000: 100%|xxxxxxxxxxxxxxxx| [final loss = 1.382]@\par~\par
+			% \only<6>\verb@    Epoch x: 10%|x                | [880/1000 10it/s, loss = 0.4]@
+			\pause\verb|    >> model.Test()|
+			}
+			
+		\end{frame}
+		
+	}
+	% \beginn{frame}
 
 	\begin{frame}{Today's Agenda}
 		The aim for today is:
@@ -49,9 +161,7 @@
 			\pitem Feedforward Networks
 			\pitem Non-Linearity
 			\pitem Optimisation \& Backpropagation
-			\pitem Convolutional Networks*
 		\end{itemize}
-		(\small * Time dependent!)
 
 		\pause As we progress you will slowly build up your own ML toolkit, built entirely from scratch! 
 
@@ -100,7 +210,7 @@
 				\pause \draw[dashed] (0,1)--node[above,rotate=30] {\textbf{Cute}} node[below,rotate=30] {\textbf{Not Cute}} (8,6);
 
 			\end{tikzpicture}
-		\end{center}A
+		\end{center}
 
 	\end{frame}
 
@@ -108,35 +218,121 @@
 	\begin{frame}{Splitting The Plane}
 		In order to split the plane into two parts, we merely need to define a \textit{line}. 
 		
-		\pause \textbf{Question: } If we have $N$ dimensions ($N=2$), how many parameters do we need to define a line?
+		\begin{center}
+			\begin{tikzpicture}
+			
+				\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
+					\addplot[domain = 0:10, samples = 200,blue]{5/8*x+1};
+						\end{axis}
+			
+			\end{tikzpicture}
+			\end{center}
+	\end{frame}
 
+	\begin{frame}{Splitting the plane}
+		\pause \textbf{Question: } If we have $N$ dimensions ($N=2$), how many parameters do we need to define a line?
+		
+		\vspace{2cm}
+		
 		\pause \textbf{Answer: } The answer is $N$ - in 2 dimensions, this is friendly $y = mx + c \to (m,c)$
 
-		\pause \textbf{Question: } Why then do we need $N+1$ dimensions?
+		% \pause \textbf{Question: } Why then do we need $N+1$ dimensions?
 	\end{frame}
 
 	\begin{frame}{The Perceptron}
-		We need 3 parameters to define a \textbf{directional line}. The Perceptron classifier algorithm is:
+		% We need 3 parameters to define a \textbf{directional line}. 
 		
-		\begin{equation}
+		The Perceptron classifier algorithm is:
+		
+		\only<1>{\begin{equation}
+			P(\vec{x}) = \begin{cases} 1 & \text{if } b + \vec{w} \cdot \vec{x}\footnote{The dot/inner product is covered in Section 3.1 in the notes} > 0 \\ 0 &\text{else} 
+		\end{cases}
+		\end{equation}}
+
+		\only<2,3>{\begin{equation}
 			P(\vec{x}) = \begin{cases} 1 & \text{if } \tilde{\vec{x}} \cdot \vec{w}\footnote{The dot/inner product is covered in Section 3.1 in the notes} > 0 \\ 0 &\text{else} 
 		\end{cases}
-		\end{equation}
+		\end{equation}}
 
 		\pause Where 
 		$$\tilde{\vec{x}} = \begin{pmatrix}
 			1 \\ \vec{x}
 		\end{pmatrix}$$
 		\pause $\vec{w}$ are the \textbf{weights}. 
+
+		
 	\end{frame}
 
+	\begin{frame}{The Perceptron: Dimensions}
+		\textbf{Question:} What is the dimensionality of the Perceptron? Does this conflict with our earlier statements?
 
-	\begin{frame}{Exercise 1: Perceptron Classifier}
-		\begin{center}
-			Using the provided class structure \& weights, write a perceptron classifier for the cuteness data.
+		\vspace{1cm}
 
-			The provided weights classify only one animal correctly. Which is it?
-		\end{center}
+		\pause \textbf{Hint:} It has nothing to do with the `bias'!
+
+		\vspace{1cm}
+
+		\pause \textbf{Answer:} We need $N+1$ dimensions. $N$ dimensions define a line - but need an additional dimension to add \textit{directionality}
+	\end{frame}
+
+	\begin{frame}{The Perceptron: Dimensions}
+		
+		\only<1>{\begin{center}
+			\begin{tikzpicture}
+			
+				\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
+					\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,above,rotate=40] {$y= mx + c$};
+
+					\node[rotate=0,blue] at (axis cs: 2,5) {\parbox[t]{18cm}{\centering $y> mx + c$ \\ {\small always has label 1}}};
+
+					\node[red] at (axis cs: 7,2) {\parbox[t]{18cm}{\centering $y< mx + c$ \\ {\small always has label 0}}};
+						\end{axis}
+			
+			\end{tikzpicture}
+			\end{center}}
+
+			\only<2>{\begin{center}
+				\begin{tikzpicture}
+				
+					\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
+						\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} c  \\ m  \\ +1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
+	
+						\node[rotate=0,blue] at (axis cs: 2,5) {\parbox[t]{18cm}{\centering $y> mx + c$ \\ {\small has label 1}}};
+	
+						\node[red] at (axis cs: 7,1) {\parbox[t]{18cm}{\centering $y< mx + c$ \\ {\small has label 0}}};
+							\end{axis}
+				
+				\end{tikzpicture}
+				\end{center}}
+
+
+				\only<3>{\begin{center}
+					\begin{tikzpicture}
+					
+						\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
+							\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} c  \\ m  \\ -1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
+		
+							\node[rotate=0,red] at (axis cs: 2,5) {\parbox[t]{18cm}{\centering $y> mx + c$ \\ {\small has label 0}}};
+		
+							\node[blue] at (axis cs: 7,1) {\parbox[t]{18cm}{\centering $y< mx + c$ \\ {\small has label 1}}};
+								\end{axis}
+					
+					\end{tikzpicture}
+					\end{center}}
+	\end{frame}
+
+	\begin{frame}[fragile]{Exercise 1: Perceptron Classifier}
+		% \begin{center}
+			\textbf{Task 1: } Write a perceptron classifier for the data in \verb|cuteness.dat|
+
+			\vspace{1cm}
+
+			\textbf{Guidance:} Class structure \& predetermined weights are provided in the notebook. Ignore \verb|Train()| for now
+
+			\vspace{1cm}
+
+			\textbf{Question:}	The provided weights classify only one animal correctly. Which is it?
+		% \end{center}
 	\end{frame}
 
 
@@ -151,16 +347,22 @@
 
 	\end{frame}
 
-	\begin{frame}{Exercise 2: Train Your Perceptron}
-		\begin{center}
-			Write the Train() method of your Perceptron. Run it on the cuteness data. 
+	\begin{frame}[fragile]{Exercise 2: Train Your Perceptron}
 
-			\pause How long does it take to train to 100\% accuracy?
-		\end{center}
+			\textbf{Task 2:} Write the \verb|Train()| method for your Perceptron, then apply to \verb|cuteness| data.
+
+			\vspace{1cm}
+
+			\pause\textbf{Question:}	How long does it take to train to 100\% accuracy?
+
+			\pause Give your answers on \verb|menti.com| with code \verb|2834 2684|
 	\end{frame}
 
-	\begin{frame}{Exercise 3: The Limits of Linearity}
-		Add in more data -- what goes wrong?
+	\begin{frame}[fragile]{Exercise 3: The Limits of Linearity}
+		
+		\textbf{Task 3:} Apply your method to the data in \verb|cuteness_augmented.dat|, which adds the Axolotl, Otter, Capybara, Quokka, Slug, Tasmanian Devil and Giant Panda.
+
+		\textbf{Question:} What has gone wrong? Who are the troublemakers?
 
 		\only<2>{\centering \includegraphics[width=0.8\linewidth,height=0.7\paperheight,keepaspectratio=true]{accuracy_bigStep.png}}
 
@@ -251,6 +453,7 @@
 
 	\newcommand\cec[1]{{\vec{#1}}}
 	{
+
 	\nologo
 	\begin{frame}{The Multilayered Perceptron}
 		% Let's try chaining lots of pecreptrons together.....
@@ -327,33 +530,31 @@
 
 	\begin{frame}{Exercise 4: The Multilayered Perceptron}
 	
-		\begin{center}
-			\bf I have provided the skeleton of a Node, Layer and Network class. 
-			\\
-			~
-			\\
-			\pause Fill them in so that you can construct and operate a network. 
-			\\
-			~
-			\\
-			\pause Do you notice anything odd about how this predictor behaves?
-			\\
-			~
-			\\
-			~
-			\\
-			\pause (For now: randomly initialise your weights)
-		\end{center}
+		% \begin{center}
+
+		\textbf{Task 4:} Write a Feedforward Network.
+
+		\vspace{1cm}
+
+		\pause \textbf{Guidance:} I have provided the skeleton of a Node, Layer and Network class. Randomly initialise your weights between -1 and 1.
+			
+		\vspace{1cm}
+
+		\pause \textbf{Question:}  Do you notice anything odd about how this predictor behaves?
 	\end{frame}
 
 	\begin{frame}{All that for nothing?}
 	
 		If everything went well, you should see something like this:
 
-		\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{LinearMLP.png}
+		\only<2>{\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{linear_1.png}}
+		\only<3>{\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{linear_2.png}}
+		\only<4>{\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{linear_3.png}}
+		\only<5>{\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{linear_4.png}}
 	\end{frame}
 
 	{
+
 	\nologo
 	\begin{frame}{Affine Mess We Find Ourselves in}
 		% Let's try chaining lots of pecreptrons together.....
@@ -513,17 +714,48 @@
 	\begin{frame}{Affine Mess We Find Ourselves in}
 		Or, in terms of \textbf{Affine Operators} (Chapter 3.4 in the notes):
 
-		\begin{spalign}
-			\vec{x}_1 & = \hat{\mathcal{W}_1} \vec{x}_\text{input}
-			\\
-			\vec{x}_2 & = \hat{\mathcal{W}_2} \vec{x}_1 = \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
-			\\
-			\vec{x}_3 & = \hat{\mathcal{W}_3} \vec{x}_2 =  \hat{\mathcal{W}}_3 \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
-			\\
-			\vdots
-			\\
-			x_\text{output} & = \begin{cases} 1 & \hat{\mathcal{W}_N} \vec{x}_{N-1} > 0 \\ 0 &\text{else} \end{cases}
-		\end{spalign}
+		\vspace{0.5cm}
+
+		$$\Bigg(\text{Affine = Matrix multiplicaiton + translation} \Longrightarrow \mathcal{W} \vec{v} = W \vec{v} + \vec{w} \Bigg)$$
+
+
+
+		\vspace{0.5cm}
+		\begin{tikzpicture}
+			% \draw (0,0) circle (0.4);
+			\node[draw,circle] at (0.3,0) {\footnotesize Input};
+			\draw[->] (0.9,0)--(1.2,0);
+			\def\baseheight{-3.5}
+			\node[anchor=west] at (1.1,0) {${\vec{x}}$};
+
+			\pause\draw[ultra thick,->] (1.5,0)--node[below]{\footnotesize Affine 1}++(1,0);
+			
+			\node[anchor=west] at (2.51,0) {$\mathcal{W}_1 \vec{x}$};
+			\pause\draw[ultra thick,->] (3.5,0)--node[below]{\footnotesize Affine 2}++(1,0);
+	
+			\node[anchor=west] at (4.8,0) {$ \mathcal{W}_2 \mathcal{W}_1 \vec{x}$};
+
+			\pause\draw[ultra thick,->] (6.5,0)--node[below]{\footnotesize Affine 3}++(1,0);
+			
+			\node[anchor=west] at (7.8,0) {$\mathcal{W}_3 \mathcal{W}_2 \mathcal{W}_1 \vec{x}$};
+
+			\draw[ultra thick,->] (10.5,0)--node[below]{\footnotesize Affine 4...}++(1,0);
+			% \draw [decorate, decoration = {calligraphic brace}] (15,1) --  (15,-1);
+			% \node[anchor=west] at (15.2,0) {$\vec{x}_{n}$};
+		\end{tikzpicture}
+
+
+		% \begin{spalign}
+		% 	\vec{x}_1 & = \hat{\mathcal{W}_1} \vec{x}_\text{input}
+		% 	\\
+		% 	\vec{x}_2 & = \hat{\mathcal{W}_2} \vec{x}_1 = \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
+		% 	\\
+		% 	\vec{x}_3 & = \hat{\mathcal{W}_3} \vec{x}_2 =  \hat{\mathcal{W}}_3 \hat{\mathcal{W}}_2 \hat{\mathcal{W}}_1 \vec{x}_\text{input}
+		% 	\\
+		% 	\vdots
+		% 	\\
+		% 	x_\text{output} & = \begin{cases} 1 & \hat{\mathcal{W}_N} \vec{x}_{N-1} > 0 \\ 0 &\text{else} \end{cases}
+		% \end{spalign}
 	\end{frame}
 
 	\begin{frame}{Affine Mess We Find Ourselves in}
@@ -559,13 +791,18 @@
 	\begin{frame}{NonLinearity to the Rescue!}
 		Need to break this affine relationship: enter \textbf{activation functions}.
 
+	\end{frame}
+
+	\begin{frame}{NonLinearity to the Rescue!}
+	
 		Let:
 		\begin{equation}
 			\vec{x}_n = \text{activate}\left(W \vec{x}_{n-1} + \vec{b} \right)
 		\end{equation}
-		Where $\text{activate}\left(x\right)$ is a non-linear function, the activation function.
+		
+		\vspace{1cm}
 
-		One of the simples ways to break linearity is to add a \textit{elementwise function}:
+		\pause One of the simples ways to break linearity is to add a \textit{elementwise function}:
 
 		\begin{spalign}
 			\vec{v} & = W \vec{x}_{n-1} + \vec{b}
@@ -573,7 +810,6 @@
 			[\vec{x}_n]_i & = \sigma(v_i)
 		\end{spalign}
 		
-		Elementwise operations on vectors are -- except for very specific cases -- great for making vectors forget that they're vectors.
 	\end{frame}
 
 	\begin{frame}{Elementwise Activation Functions}
@@ -588,7 +824,7 @@
 			\\
 			\text{tanh} & && \tanh(x) && = \frac{\exp(x) - \exp(-x)}{\exp(x) + \exp(-x)}
 			\\
-			\text{Softplus} & && \text{sft}(x) && = \log\left( 1+ \exp(-x) \right)
+			\text{Softplus} & && \text{sft}(x) && = \log\left( 1+ \exp(x) \right)
 		\end{alignat*}
 
 		\textit{(Bonus Question: Can you name any commonly used functions which \textbf{don't} follow this pattern?)}
