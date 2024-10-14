@@ -295,7 +295,7 @@
 				\begin{tikzpicture}
 				
 					\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
-						\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} c  \\ m  \\ +1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
+						\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} -c  \\ -m  \\ +1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
 	
 						\node[rotate=0,blue] at (axis cs: 2,5) {\parbox[t]{18cm}{\centering $y> mx + c$ \\ {\small has label 1}}};
 	
@@ -310,7 +310,7 @@
 					\begin{tikzpicture}
 					
 						\begin{axis}[xmin = 0, xmax = 10, ymin = 0, ymax = 6, ylabel={Fur}, xlabel ={Size},x post scale = 1]
-							\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} c  \\ m  \\ -1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
+							\addplot[domain = 0:8, samples = 200,black]{5/8*x+1} node[midway,below,rotate=40] {$|v|\begin{bmatrix} -c  \\ -m  \\ -1 \end{bmatrix} \cdot \begin{bmatrix} 1 \\ x \\ y \end{bmatrix} > 0$};
 		
 							\node[rotate=0,red] at (axis cs: 2,5) {\parbox[t]{18cm}{\centering $y> mx + c$ \\ {\small has label 0}}};
 		
