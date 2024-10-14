@@ -21,11 +21,13 @@ def member_2(self,a):
 	#initialise vectors or correct shape
 	self.A = np.random.normal(0,0.3,(a,))
 	self.B = np.zeros((a,))
-	self.C = np.zeros((a,))
-	self.D = np.zeros((a,))
+	
+	## only need these if you're using ADAM
+	# self.C = np.zeros((a,))
+	# self.D = np.zeros((a,))
 
-	#initialise counter
-	self.E = 1
+	# #initialise counter
+	# self.E = 1
 
 	#initialise holder variables
 	self.F = 0
@@ -90,7 +92,7 @@ def member_11(self,a):
 
 def member_12(self,a):
 	step = a * self.B / np.linalg.norm(self.B)
-	self.A += step
+	self.A -= step #minimising
 	self.B *= 0 ## clear for the next iteration!
 
 def member_13(self,a): #default function (linear). Overwritten by child classes
@@ -126,8 +128,8 @@ def member_15(self, a,b,c ,d):
 				l.member_x(e)
 			
 			if s % 100 == 0:
-				print(s,"C=",C,alpha)
-				alpha*=0.9
+				print(s,"C=",C,e)
+				e*=0.9
 		return
 
 def member_16(self,a):
@@ -147,7 +149,7 @@ def member_19(self, y):
 	return 0.01
 
 def member_20(self,a,b):
-	return -(a-b)**2
+	return (a-b)**2
 
 def member_21(self,a,b):
-	return -2 * (a-b)
+	return 2 * (a-b)

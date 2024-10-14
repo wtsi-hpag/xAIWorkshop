@@ -837,5 +837,186 @@
 
 		\includegraphics[width=\linewidth,height=0.8\paperheight,keepaspectratio=true]{NonLinearMLP.png}
 	\end{frame}
+
+
+	\begin{frame}{Exercise 5: Activation Functions}
+	
+		% \begin{center}
+
+		\textbf{Task 5:} Add in an activation function, and test if the linearity problem persists.
+
+		\vspace{1cm}
+
+		\pause \textbf{Guidance:} It is probably easiest to write ``Custom Nodes'' as child classes of your Nodes.
+			
+		\vspace{1cm}
+
+		\pause \textbf{Question:}  Do you notice anything odd about how this predictor behaves?
+	\end{frame}
+
+
+	\begin{frame}{Training the Network}
+		Buckle up, folks. The equations are about to start.
+	\end{frame}
+
+	\begin{frame}{Cost Function}
+		We suppose we have a cost function, $C(P,\ell)$ which measures how wrong a prediction $P$ is, given a true value $\ell$:
+		\begin{itemize}
+			\pitem $C$ should be differentiable, $\pdiv{C}{P}$ 
+			\pitem $C$ should be large when $P \neq \ell$ and small when $P \approx \ell$
+		\end{itemize}
+
+		\pause The total cost of the network is then:
+		\begin{equation}
+			\mathcal{L} = \sum_i C(\vec{d}_i,\ell_i)
+		\end{equation}
+		Need to find $\vec{w}$ which minimise this cost.
+	\end{frame}
+
+	\begin{frame}{Optimisation}
+		Analytical solutions are impossible, but numerically:
+
+		\begin{equation}
+			\vec{w} \to \vec{w} - \alpha \pdiv{ \mathcal{L}}{\vec{w}}
+		\end{equation}
+
+		If we iterate this equation enough times we will approach an optimal value. This is \textbf{gradient descent}.
+	\end{frame}
+
+	\begin{frame}{The Chain Rule}
+		Recall that:
+		$$ y_\ell^i = \vec{w}_\ell^i \cdot \tilde{\vec{x}}_{\ell-1}$$
+
+		The chain rule says:
+		\begin{align}
+			\pdiv{C}{\vec{w}_\ell^i} & = \pdiv{C}{y_\ell^i} \times \pdiv{y_\ell^i}{\vec{w}_\ell^i}
+			\\
+			& = \pdiv{C}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
+		\end{align}
+
+		\pause So....what is $\pdiv{C}{y_\ell^i}$?
+	\end{frame}
+
+	
+
+	\begin{frame}{The Chain Rule}
+		This next step is magic.
+
+		\begin{enumerate}
+			\pitem $y_{i+1}^j$ is a function only of the set of $y_i$ in the lower layer:
+			$$ y_{i+1}^j = \vec{w}_{i+1}^j \cdot \begin{bmatrix}
+				1 \\ a_{i}(y_i^1) \\ a_{i}(y_i^2) \\ \cdots
+			\end{bmatrix}$$
+			\pitem Therefore can compute
+			$$ \pdiv{y_{i+1}^j}{y_i^k} = d_i(y_i^k) \left[ \vec{w}_{i+1}^j \right]_{k+1}~~~~~~~~~d_i(y) = \div{a_i}{y}$$
+			\pitem But our magic chain rule says:
+			$$\pdiv{C}{y_i^k} = \sum_j \pdiv{C}{y_{i+1}^j} \pdiv{y_{i+1}^j}{y_i^k}$$
+
+		\end{enumerate} 
+	\end{frame}
+
+	\begin{frame}{The Chain Rule}
+
+		To summarise:
+		\begin{itemize}
+		\pitem If we know $ \pdiv{\mathcal{L}}{\vec{w}_\ell^i}$ we can update our weights
+		\pitem If we know  $\pdiv{C}{\vec{w}_\ell^i}$, we can compute $ \pdiv{\mathcal{L}}{\vec{w}_\ell^i}$:
+		$$ \pdiv{\mathcal{L}}{\vec{w}_\ell^i} = \sum_\text{data $\vec{q}$} \pdiv{C(\vec{q})}{\vec{w}_\ell^i}$$
+		\pitem If we know $\pdiv{C}{y_\ell^i}$ we can compute
+		$$ \pdiv{C}{\vec{w}_\ell^i} = \pdiv{C}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}$$
+		\pitem If we know $\pdiv{C}{y_{N}^j}$, we can compute $\pdiv{C}{y_{N-1}^j}$
+		\pitem If we know $\pdiv{C}{y_{N-1}^j}$, we can compute $\pdiv{C}{y_{N-2}^j}$
+		\pitem If we know $\pdiv{C}{y_{N-2}^j}$, we can compute $\pdiv{C}{y_{N-3}^j}$
+		\pitem ....
+		\end{itemize}
+
+
+	\end{frame}
+
+	\begin{frame}{The Missing Ingredient}
+		\centering So what is $\pdiv{C}{y_{N}^j}$?
+	\end{frame}
+
+	\begin{frame}{The Missing Ingredient}
+
+		Final layer has:
+		\only<2>{\begin{equation}
+			\vec{P} = \vec{x}_N  
+		\end{equation}}
+
+		\only<3>{\begin{equation}
+			\vec{P} = \mathcal{A}(\vec{y}_N)  
+		\end{equation}}
+
+		\only<4>{\begin{equation}
+			\vec{P} = \begin{pmatrix} a_N(y_N^1) \\ a_N(y_N^2) \\ a_N(y_N^3) \\ \vdots \end{pmatrix}
+		\end{equation}}
+
+		\only<5>{\begin{equation}
+			\begin{pmatrix} P_1 \\ P_2 \\ P_3 \\ \vdots \end{pmatrix} = \begin{pmatrix} a_N(\vec{w}_N^1 \cdot \tilde{x}_{N-1}) \\ a_N(\vec{w}_N^2 \cdot \tilde{x}_{N-1}) \\ a_N(\vec{w}_N^3 \cdot \tilde{x}_{N-1}) \\ \vdots \end{pmatrix}
+		\end{equation}}
+
+	\end{frame}
+
+	\begin{frame}{Getting the Gradients}
+
+		\pause Then:
+		\begin{equation}
+			\pdiv{P_i}{y_N^i} = d_N(y_N^i)  
+		\end{equation}
+		\pause Which means:
+		\begin{align}
+			\pdiv{C}{y_N^i} & = \pdiv{C}{P_i} \times \pdiv{P_i}{y_N^i}
+			\\
+			& = d_N(y_N^i)\pdiv{C}{P_i} 
+		\end{align}
+		
+	\end{frame}
+
+	\begin{frame}{Backpropagation, Explained (right?)}
+		Collecting this altogether, what we need to compute is:
+		\begin{align*}
+				\pdiv{C_q}{y_\ell^i} & = \begin{cases} \pdiv{C_q}{P_q^i} \times d_N(y_N^i) & \text{ if $\ell = N-1$}
+					\\
+					d_\ell(y_\ell^i) \sum_{j}  \left[ \vec{w}_{\ell+1}^j \right]_{i+1} \pdiv{C_q}{y_{\ell+1}^j}
+					\end{cases}
+				\\
+				\pdiv{C_q}{\vec{w}_\ell^i} & = \pdiv{C_q}{y_\ell^i} \tilde{\vec{x}}_{\ell-1}
+		\end{align*}
+	\end{frame}
+
+
+	\begin{frame}[fragile]{Task 6: Training Day}
+		\textbf{Task 6:} Assemble the obfuscated code in \verb|Data/jigsaw.py| into the class structures provided.
+
+		\vspace{1cm}
+
+		\pause \textbf{Guidance:} Hints are available in  \verb|Hints/jigsaw.py|
+			
+		\vspace{1cm}
+
+		\pause \textbf{Question:} Can the classifier fit the augmented cuteness data? How about the `complex classifier' problem in \verb|Data/complex_classifier?|? Can your network do functional regression with \verb|Data/complex_function|?
+	\end{frame}
+
+	\begin{frame}{Complex Function}
+		The function you're trying to emulate is:
+
+		\begin{align*}
+			f(x,y) = & \frac{10}{1 + \exp\left(10\sqrt{x^2 + y^2} -5\right)}
+			\\
+			& - \frac{15}{1 + \exp\left(5\sqrt{(x-2)^2 + (y-2)^2}-2.5\right)}
+			\\
+			& - \frac{15}{1 + \exp\left(5\sqrt{(x+2)^2 + (y-2)^2}-2.5\right)}
+			\\
+			& - \frac{18}{1 + \exp\left(2\left[(0.1-x/2)^2 + 7\left(\frac{5}{4}(y+2.5) - \frac{x^2}{4}\right)^2\right] - 1\right)}
+		\end{align*}
+	\end{frame}
+
+	\begin{frame}{Thank you!}
+		
+		\begin{center}
+			\includegraphics[width=0.8\paperwidth,height=0.8\paperheight,keepaspectratio=true]{smile.png}
+		\end{center}
+	\end{frame}
 \end{document}
 

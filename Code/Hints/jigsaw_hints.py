@@ -1,60 +1,69 @@
 
+
 def constructor_1(self,a,b):
-	self.A = []
+	self.Nodes = []
 	for i in range(a):
-		self.A.append(b())
-	self.B = np.zeros((a+1,)) ##augmentation occurs here. = \tilde{x}!
-	self.B[0] = 1 #and there's my augmentation value
+		self.Nodes.append(b())
+	self.OutputVector = np.zeros((a+1,)) ##augmentation occurs here. = \tilde{x}!
+	self.OutputVector[0] = 1 #and there's my augmentation value
 
 def constructor_2(self,b,c=1):
-	self.A = [] 
-	self.B = b
-	self.C = c
+	self.Layers = [] ## initialised empty, added to via another function
+	self.InputDimension = b
+	self.OutputDimension = c
 
 
+
+## the dot product should be a big giveaway as to what this function is doing!
 def member_1(self,a):
 	self.F = np.dot(self.A,a) #store in member for use later.
 	return self.member_x(self.F)
 
 
+## this is an initialiser -- a post-facto constructor
 def member_2(self,a):
 	#initialise vectors or correct shape
-	self.A = np.random.normal(0,0.3,(a,))
-	self.B = np.zeros((a,))
-	self.C = np.zeros((a,))
-	self.D = np.zeros((a,))
+	self.Weights = np.random.normal(0,0.3,(a,))
+	self.Gradient = np.zeros((a,))
+	
+	## only need these if you're using ADAM
+	# self.C = np.zeros((a,))
+	# self.D = np.zeros((a,))
 
-	#initialise counter
-	self.E = 1
-
+	# #initialise counter
+	# self.E = 1
 	#initialise holder variables
-	self.F = 0
-	self.dF = 0
+	self.Y = 0
+	self.dLdY = 0
 
 
 
-def member_3(self,a):
+def Predict(self,a): ## this is the predict module -- who does it belong to?
 	if len(a) == self.B:
 		a = np.insert(a,0,1) ## augment if needed. Provides option (when bulk-repeat processing, augmenting first will be better for speed)
-	self.A[0].member_x(a)
+
+
+	self.A[0].Predict(a)
 	for i in range(1,len(self.A)):
-		self.A[i].member_x(self.A[i-1].B)
+		self.A[i].Predict(self.A[i-1].B)
 	return self.A[-1].B[1:] ##have to omit the augment from the final ouput
 
 
 
-
+# this updates the internal dLdY values, and adds to an internal gradient vector
 def member_4(self, a, b): 
-	self.dF = a
-	self.B += self.dF * b 
+	self.dLdY = a
+	self.Gradient += self.dF * b 
 
 
-
+#this passes along an initialiser to its members. Maybe it's an initialiser itself?
 def member_5(self,a):
 	for b in self.A:
 		b.Initialise(a)
 
-def member_6(self, a):
+
+
+def Predict(self, a):
 	for i,b in enumerate(self.A):
 		self.B[i+1] = b.member_x(a) ##offset for augmentation purposes!
 
@@ -99,7 +108,7 @@ def member_13(self,a): #default function (linear). Overwritten by child classes
 def member_14(self,a):#default function (linear). Overwritten by child classes
 	return 1
 
-def member_15(self, a,b,c ,d):
+def Train(self, a,b,c ,d):
 		self.member_x()
 
 		e = 0.1
